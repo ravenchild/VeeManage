@@ -1,15 +1,27 @@
 package org.uigl.veemanage;
 
 import java.io.File;
+import java.util.logging.Logger;
+
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
+
+import com.almworks.sqlite4java.SQLiteException;
 
 public class VeeManage {
 
+	public static final Logger LOGGER = Logger.getLogger(VeeManage.class.getName());
+	private static Settings VeeManageSettings;
+	
 	public static void main(String[] args) {
 		System.out.println("VeeManage 0.0.1");
+		try {
+			VeeManageSettings = Settings.getSettingsFromDB();
+		} catch (SQLiteException e1) {
+			e1.printStackTrace();
+		}
 		
 		try {
-			new VeeManageHTTPD( VeeManageHTTPD.WWW_PORT, new File(VeeManageHTTPD.WWW_ROOT).getAbsoluteFile());
+			new VeeManageHTTPD( Settings.DEFAULT_WWW_PORT, new File(Settings.DEFAULT_WWW_ROOT).getAbsoluteFile());
 		} catch(Exception e) {
 			System.err.println( "Couldn't start server:\n" + e );
 			System.exit( -1 );
@@ -18,6 +30,10 @@ public class VeeManage {
 
 		try { System.in.read(); } catch( Throwable t ) {}
 		
+	}
+	
+	public static Settings getSettings() {
+		return VeeManageSettings;
 	}
 	
 }
