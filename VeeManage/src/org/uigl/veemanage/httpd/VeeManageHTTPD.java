@@ -35,7 +35,11 @@ public class VeeManageHTTPD extends NanoHTTPD {
 			cookiesToParams(header, params);
 			Response index = new Response();
 			Session userSession = startSession(index, params);
-			if (userSession.getBoolean("newSession", true)) {
+			
+			if ( params.getProperty("clear", "").equals("true") ) {
+				userSession = removeSession(userSession);
+				redirectHeader(index, "/");
+			} else if (userSession.getBoolean("newSession", true)) {
 				index.status = HTTP_OK;
 				index.mimeType = MIME_HTML;
 				index.data = new ByteArrayInputStream("<html><body>New Session</body></html>".getBytes());
@@ -43,7 +47,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 			} else {
 				index.status = HTTP_OK;
 				index.mimeType = MIME_HTML;
-				index.data = new ByteArrayInputStream("<html><body>Old Stinky Session</body></html>".getBytes());
+				index.data = new ByteArrayInputStream("<html><body>Old Stinky Session <br /> <form method=\"POST\"><input type=\"hidden\" name=\"clear\" value=\"true\" /><input type=\"submit\" name=\"clearSubmit\" value=\"Clear Session\" /></form></body></html>".getBytes());
 			}
 			return index;
 		}
@@ -68,5 +72,17 @@ public class VeeManageHTTPD extends NanoHTTPD {
 			ret = mSessions.getNewSession();
 		r.addHeader("Set-Cookie", "SessionID=" + ret.getSessionID());
 		return ret;
+	}
+	
+	public static void redirectHeader(Response res, String location) {
+		res.status = HTTP_REDIRECT;
+		res.mimeType = MIME_HTML;
+		res.addHeader("Location", "/");
+		res.data = new ByteArrayInputStream("<html><body>Redirecting.<br />Click <a href=\"location\">Here</a> if you are not automatically redirected.</body></html>".getBytes());
+	}
+	
+	private Session removeSession(Session ses) {
+		mSessions.removeSession(ses.getSessionID());
+		return null;
 	}
 }
