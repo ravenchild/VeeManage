@@ -21,7 +21,7 @@ public class Settings {
 	 * HTTPD specific defaults.
 	 */
 	public static final String DEFAULT_WWW_ROOT = "wwwroot";
-	public static final int DEFAULT_WWW_PORT = 8080;
+	public static final int DEFAULT_WWW_PORT = 39183;
 	
 	public static Settings getSettingsFromDB() throws SQLiteException {
 		
