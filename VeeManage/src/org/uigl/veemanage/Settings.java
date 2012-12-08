@@ -15,7 +15,8 @@ public class Settings {
 	/**
 	 * Logging default settings
 	 */
-	private static final String DEFAULT_LOG_FILE = "veemanage.log";
+	//TODO: Add Logging to file.
+	//private static final String DEFAULT_LOG_FILE = "veemanage.log";
 	
 	/**
 	 * HTTPD specific defaults.

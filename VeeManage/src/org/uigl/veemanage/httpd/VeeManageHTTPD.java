@@ -58,6 +58,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 				if (pageClass.hasMatch(uri, method)) {
 					pageClass.init(uri, method, header, params, files, userSession);
 					page.status = pageClass.getStatus();
+					//FIXME: Change these so they don't run twice.
 					if (pageClass.getMimeType() != null)
 						page.mimeType = pageClass.getMimeType();
 					if (pageClass.getHeaders() != null)

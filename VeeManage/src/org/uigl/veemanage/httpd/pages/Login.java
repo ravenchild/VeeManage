@@ -1,10 +1,10 @@
 package org.uigl.veemanage.httpd.pages;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.uigl.veemanage.httpd.Session;
+import org.uigl.veemanage.httpd.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
 import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
 
@@ -56,9 +56,9 @@ public class Login implements VeeManageHTTPPage {
 
 	@Override
 	public InputStream getData() {
-		StringBuilder data = new StringBuilder();
-		data.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head><title>VeeManage Login</title></head><body><h1>Login</h1></body></html>");
-		return new ByteArrayInputStream(data.toString().getBytes());
+		Session pageVars = new Session(null);
+		pageVars.put("title", "Login");
+		return Template.applyTemplate("/org/uigl/veemanage/httpd/templates/Login.html", pageVars);
 	}
 
 	@Override
