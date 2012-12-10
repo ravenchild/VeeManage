@@ -16,6 +16,8 @@ public class Login implements VeeManageHTTPPage {
 	
 	private Session mUserSession = null;
 	
+	private String mErrorText = null;
+	
 	@Override
 	public boolean hasMatch(String uri, String method) {
 		return uri.equals("/login/");
@@ -35,6 +37,25 @@ public class Login implements VeeManageHTTPPage {
 			pStatus = VeeManageHTTPD.HTTP_REDIRECT;
 			pFlags |= VeeManageHTTPD.FLAG_REDIRECT;
 			return;
+		}
+		
+		if (params.getProperty("username") != null
+				&& params.getProperty("password") != null) {
+			
+			
+			//TODO: Replace this with DB lookup.
+			if (params.getProperty("username").equals("user")
+					&& params.getProperty("password").equals("123456")) {
+				
+				mUserSession.putBoolean("UserAuthenticated", true);
+				pRedirect = "/";
+				pStatus = VeeManageHTTPD.HTTP_REDIRECT;
+				pFlags |= VeeManageHTTPD.FLAG_REDIRECT;
+				return;
+				
+			} else {
+				mErrorText = "Invalid Username/Password.";
+			}
 		}
 			
 	}
@@ -58,6 +79,10 @@ public class Login implements VeeManageHTTPPage {
 	public InputStream getData() {
 		Session pageVars = new Session(null);
 		pageVars.put("title", "Login");
+		
+		//Handle errors
+		pageVars.put("error_text", mErrorText == null ? "" : mErrorText);
+		
 		return Template.applyTemplate("/org/uigl/veemanage/httpd/templates/Login.html", pageVars);
 	}
 

@@ -4,6 +4,27 @@
 		<title>VeeManage Login</title>
 	</head>
 	<body>
-		<h1><$title></h1>
+		<h1>Login</h1>
+		<div>
+			<p><$error_text></p>
+			<form method="post" action="/login/">
+				<table>
+					<tr>
+						<td>
+							<label for="username">Username</label>
+							<input type="text" name="username" id="username" maxlength="100" />
+						</td>
+						<td>
+							<label for="password">Password</label>
+							<input type="password" name="password" id="password" />
+						</td>
+						<td></td>
+						<td>
+							<input type="submit" value="Sign In" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
 	</body>
 </html>
