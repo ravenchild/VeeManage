@@ -57,7 +57,7 @@ public class Index implements VeeManageHTTPPage {
 	@Override
 	public InputStream getData() {
 		StringBuilder data = new StringBuilder();
-		data.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head><title>VeeManage Index</title></head><body><h1>Index</h1></body></html>");
+		data.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head><title>VeeManage Index</title></head><body><h1>Index</h1><a href=\"/logout/\">Logout</a></body></html>");
 		return new ByteArrayInputStream(data.toString().getBytes());
 	}
 
