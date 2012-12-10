@@ -13,7 +13,7 @@ public class Session {
 	public Session(String sessionID) {
 		this.mID = sessionID;
 		this.mVariables = new HashMap<String, Object>();
-		VeeManage.LOGGER.logp(Level.INFO, Session.class.getName(), "Session(UUID id)", "New Session");
+		VeeManage.LOGGER.logp(Level.INFO, Session.class.getName(), "Session(UUID id)", "New Session (" + (sessionID == null ? "null" : sessionID) + ")");
 	}
 	
 	public String getSessionID() {
