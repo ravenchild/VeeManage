@@ -31,6 +31,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	
 	private final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[]{
 			new org.uigl.veemanage.httpd.pages.Index(),
+			new org.uigl.veemanage.httpd.pages.Logout(),
 			new org.uigl.veemanage.httpd.pages.Login()
 	};
 	
