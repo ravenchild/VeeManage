@@ -32,28 +32,31 @@ public class Template {
 	        if (!mBuffer.isEmpty())
 	            return mBuffer.remove();
 
-	        int c1 = super.read();
-	        if (c1 != '<' || mArgs == null)
-	            return c1;
-
-	        int c2 = super.read();
-
-	        if (c2 == '$') {
-	            StringBuffer varName = new StringBuffer();
-	            while ((c2 = super.read()) != '>')
-	                varName.append((char) c2);
-	            
-	            Object varVal = mArgs.get(varName.toString());
-	            if (varVal == null || varVal.toString() == null) {
-	            	VeeManage.LOGGER.logp(Level.WARNING, TemplateStream.class.getName(), "read()", "Cannot find variable \"" + varName + "\"");
-	            	varVal = varName;
-	            }
-	            for (char vc : varVal.toString().toCharArray())
-	            	mBuffer.add(vc);
-	            
-	            return mBuffer.remove();
-
-	        } else {
+	        while (true) {
+		        int c1 = super.read();
+		        if (c1 != '<' || mArgs == null)
+		            return c1;
+	
+		        int c2 = super.read();
+	
+		        if (c2 == '$') {
+		            StringBuffer varName = new StringBuffer();
+		            while ((c2 = super.read()) != '>')
+		                varName.append((char) c2);
+		            
+		            Object varVal = mArgs.get(varName.toString());
+		            if (varVal == null || varVal.toString() == null) {
+		            	VeeManage.LOGGER.logp(Level.WARNING, TemplateStream.class.getName(), "read()", "Cannot find variable \"" + varName + "\"");
+		            	varVal = varName;
+		            }
+		            for (char vc : varVal.toString().toCharArray())
+		            	mBuffer.add(vc);
+		            
+		            if (mBuffer.isEmpty())
+		            	continue;
+		            return mBuffer.remove();
+		        }
+		        
 	        	mBuffer.add((char) c2);
 	            return c1;
 	        }
