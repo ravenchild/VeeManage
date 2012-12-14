@@ -25,6 +25,9 @@ import java.util.TimeZone;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+
 /**
  * A simple, tiny, nicely embeddable HTTP 1.0 (partially 1.1) server in Java
  *
@@ -222,7 +225,12 @@ public class NanoHTTPD
 	{
 		myTcpPort = port;
 		this.myRootDir = wwwroot;
-		myServerSocket = new ServerSocket( myTcpPort );
+		if (System.getProperty("javax.net.ssl.keyStore") != null) {
+			ServerSocketFactory ssocketFactory = SSLServerSocketFactory.getDefault();
+			myServerSocket = ssocketFactory.createServerSocket(myTcpPort);
+		} else {
+			myServerSocket = new ServerSocket( myTcpPort );
+		}
 		myThread = new Thread( new Runnable()
 			{
 				public void run()
