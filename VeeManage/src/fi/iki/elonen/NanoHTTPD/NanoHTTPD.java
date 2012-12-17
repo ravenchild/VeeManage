@@ -477,6 +477,10 @@ public class NanoHTTPD
 			try {
 				// Read the request line
 				String inLine = in.readLine();
+				if (inLine == null || inLine.length() == 1) {
+					in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
+					inLine = inLine + in.readLine();
+				}
 				if (inLine == null) return;
 				StringTokenizer st = new StringTokenizer( inLine );
 				if ( !st.hasMoreTokens())
