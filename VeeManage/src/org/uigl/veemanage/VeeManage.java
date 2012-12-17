@@ -1,6 +1,7 @@
 package org.uigl.veemanage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
@@ -18,6 +19,17 @@ public class VeeManage {
 			VeeManageSettings = Settings.getSettingsFromDB();
 		} catch (SQLiteException e1) {
 			e1.printStackTrace();
+		}
+		
+		if (Settings.DEFAULT_WWW_SSL) {
+			try {
+				if (new File("key.store").exists()) {
+					System.setProperty("javax.net.ssl.keyStore", new File("key.store").getAbsolutePath());
+					System.setProperty("javax.net.ssl.keyStorePassword", "eLKTPWTlFvKz8Aos1dMvtNvlbxsP70PJeQkVdm4Qzzyj8o9hjetWOHwVbdupTng");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		try {
