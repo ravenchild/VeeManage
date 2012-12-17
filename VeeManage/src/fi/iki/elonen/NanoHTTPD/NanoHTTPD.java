@@ -228,8 +228,10 @@ public class NanoHTTPD
 		if (System.getProperty("javax.net.ssl.keyStore") != null) {
 			ServerSocketFactory ssocketFactory = SSLServerSocketFactory.getDefault();
 			myServerSocket = ssocketFactory.createServerSocket(myTcpPort);
+			myServerSocketSSL = true;
 		} else {
 			myServerSocket = new ServerSocket( myTcpPort );
+			myServerSocketSSL = false;
 		}
 		myThread = new Thread( new Runnable()
 			{
@@ -478,7 +480,7 @@ public class NanoHTTPD
 				// Read the request line
 				String inLine = in.readLine();
 				if (inLine == null) return;
-				if (inLine.length() == 1) {
+				if (inLine.length() == 1 && myServerSocketSSL) {
 					in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 					inLine = inLine + in.readLine();
 				}
@@ -844,6 +846,7 @@ public class NanoHTTPD
 
 	private int myTcpPort;
 	private final ServerSocket myServerSocket;
+	private final boolean myServerSocketSSL;
 	private Thread myThread;
 	private File myRootDir;
 
