@@ -8,6 +8,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
+import java.util.logging.Level;
+
+import org.uigl.veemanage.VeeManage;
 
 import fi.iki.elonen.NanoHTTPD.NanoHTTPD;
 
@@ -47,6 +50,8 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	@Override
 	public Response serve(String uri, String method, Properties header, Properties params, Properties files) {
 
+		VeeManage.LOGGER.logp(Level.INFO, VeeManageHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "URI:" + uri);
+		
 		Response page = new Response();
 		page.status = HTTP_OK;
 		page.mimeType = MIME_HTML;
