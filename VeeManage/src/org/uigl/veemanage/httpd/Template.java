@@ -55,6 +55,28 @@ public class Template {
 		            if (mBuffer.isEmpty())
 		            	continue;
 		            return mBuffer.remove();
+		        }	
+		        if (c2 == '#') {
+		            StringBuffer incName = new StringBuffer();
+		            while ((c2 = super.read()) != '>')
+		            	incName.append((char) c2);
+		            
+		            try {
+			            InputStream template = ClassLoader.class.getResourceAsStream(incName.toString());
+			            TemplateStream includeStream =  new Template.TemplateStream(template, mArgs);
+			            int includeChar = includeStream.read();
+			            while (includeChar > 0) {
+			            	mBuffer.add((char)includeChar);
+			            	includeChar = includeStream.read();
+			            }
+			            includeStream.close();
+		            } catch (Exception e) {
+		            	VeeManage.LOGGER.logp(Level.WARNING, TemplateStream.class.getName(), "read()", "Cannot find resource \"" + incName + "\"");
+		            }
+		            
+		            if (mBuffer.isEmpty())
+		            	continue;
+		            return mBuffer.remove();
 		        }
 		        
 	        	mBuffer.add((char) c2);
