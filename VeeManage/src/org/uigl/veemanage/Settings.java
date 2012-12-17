@@ -23,6 +23,7 @@ public class Settings {
 	 */
 	public static final String DEFAULT_WWW_ROOT = "wwwroot";
 	public static final int DEFAULT_WWW_PORT = 39183;
+	public static final boolean DEFAULT_WWW_SSL = true;
 	
 	public static Settings getSettingsFromDB() throws SQLiteException {
 		
