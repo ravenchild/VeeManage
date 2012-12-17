@@ -20,6 +20,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	public static final int FLAG_REDIRECT = 1;
 	public static final int FLAG_REMOVE_SESSION = 2;
 	public static final int FLAG_FILE = 4;
+	public static final int FLAG_NO_CACHE = 8;
 	
 	public interface VeeManageHTTPPage {
 		public boolean hasMatch(String uri, String method);
@@ -73,9 +74,11 @@ public class VeeManageHTTPD extends NanoHTTPD {
 						page.data = pageClass.getData();
 					else
 						page.data = new ByteArrayInputStream("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head></head><body></body></html>".getBytes());
-	
+
 					if ((pageClass.getFlags() & FLAG_REDIRECT) == FLAG_REDIRECT)
 						redirectHeader(page, pageClass.getRedirectLocation());
+					if ((pageClass.getFlags() & FLAG_NO_CACHE) == FLAG_NO_CACHE)
+						noCacheHeader(page);
 					if ((pageClass.getFlags() & FLAG_REMOVE_SESSION) == FLAG_REMOVE_SESSION)
 						userSession = removeSession(userSession);
 					if ((pageClass.getFlags() & FLAG_FILE) == FLAG_FILE)
@@ -118,6 +121,11 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		res.mimeType = MIME_HTML;
 		res.addHeader("Location", location);
 		res.data = new ByteArrayInputStream(("<html><body>Redirecting.<br />Click <a href=\"" + location + "\">Here</a> if you are not automatically redirected.</body></html>").getBytes());
+	}
+	
+	public static void noCacheHeader(Response res) {
+		res.addHeader("Cache-Control", "no-cache, must-revalidate");
+		res.addHeader("Expires", "Sat, 26 Jul 1997 05:00:00 GMT");
 	}
 	
 	private Session removeSession(Session ses) {

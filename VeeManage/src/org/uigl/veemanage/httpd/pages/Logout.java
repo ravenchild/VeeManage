@@ -41,7 +41,7 @@ public class Logout implements VeeManageHTTPPage {
 
 	@Override
 	public int getFlags() {
-		return VeeManageHTTPD.FLAG_REDIRECT;
+		return VeeManageHTTPD.FLAG_REDIRECT | VeeManageHTTPD.FLAG_NO_CACHE;
 	}
 
 	@Override
