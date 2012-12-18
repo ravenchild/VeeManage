@@ -22,8 +22,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.LinkedList;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -92,7 +97,7 @@ public class NanoHTTPD
 	{
 		myOut.println( method + " '" + uri + "' " );
 
-		Enumeration e = header.propertyNames();
+		Enumeration<?> e = header.propertyNames();
 		while ( e.hasMoreElements())
 		{
 			String value = (String)e.nextElement();
@@ -370,7 +375,7 @@ public class NanoHTTPD
 				splitbyte++;
 
 				// Write the part of body already read to ByteArrayOutputStream f
-				ByteArrayOutputStream f = new ByteArrayOutputStream();
+				RandomAccessFile f = getTmpBucket();
 				if (splitbyte < rlen) f.write(buf, splitbyte, rlen-splitbyte);
 
 				// While Firefox sends on the first read all the data fitting
@@ -395,10 +400,11 @@ public class NanoHTTPD
 				}
 
 				// Get the raw body as a byte []
-				byte [] fbuf = f.toByteArray();
+				ByteBuffer fbuf = f.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, f.length());
+				f.seek(0);
 
 				// Create a BufferedReader for easily reading it as string.
-				ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
+				InputStream bin = new FileInputStream(f.getFD());
 				BufferedReader in = new BufferedReader( new InputStreamReader(bin));
 
 				// If the method is POST, there may be parameters
@@ -443,7 +449,7 @@ public class NanoHTTPD
 				}
 
 				if ( method.equalsIgnoreCase( "PUT" ))
-					files.put("content", saveTmpFile( fbuf, 0, f.size()));
+					files.put("content", saveTmpFile(fbuf, 0, fbuf.limit()));
 
 				// Ok, now do the serve()
 				Response r = serve( uri, method, header, parms, files );
@@ -466,6 +472,10 @@ public class NanoHTTPD
 			catch ( InterruptedException ie )
 			{
 				// Thrown by sendError, ignore and exit the thread.
+			}
+			finally
+			{
+				myTmpFiles.cleanup();
 			}
 		}
 
@@ -533,7 +543,7 @@ public class NanoHTTPD
 		 * Decodes the Multipart Body data and put it
 		 * into java Properties' key - value pairs.
 		**/
-		private void decodeMultipartData(String boundary, byte[] fbuf, BufferedReader in, Properties parms, Properties files)
+		private void decodeMultipartData(String boundary, ByteBuffer fbuf, BufferedReader in, Properties parms, Properties files)
 			throws InterruptedException
 		{
 			try
@@ -615,14 +625,13 @@ public class NanoHTTPD
 		/**
 		 * Find the byte positions where multipart boundaries start.
 		**/
-		public int[] getBoundaryPositions(byte[] b, byte[] boundary)
+		public int[] getBoundaryPositions(ByteBuffer b, byte[] boundary)
 		{
 			int matchcount = 0;
 			int matchbyte = -1;
-			Vector matchbytes = new Vector();
-			for (int i=0; i<b.length; i++)
-			{
-				if (b[i] == boundary[matchcount])
+			Vector<Integer> matchbytes = new Vector<Integer>();
+			for (int i=0; i<b.limit(); i++) {
+				if (b.get(i) == boundary[matchcount])
 				{
 					if (matchcount == 0)
 						matchbyte = i;
@@ -654,7 +663,7 @@ public class NanoHTTPD
 		 * to a temporary file.
 		 * The full path to the saved file is returned.
 		**/
-		private String saveTmpFile(byte[] b, int offset, int len)
+		private String saveTmpFile(ByteBuffer b, int offset, int len)
 		{
 			String path = "";
 			if (len > 0)
@@ -662,10 +671,14 @@ public class NanoHTTPD
 				String tmpdir = System.getProperty("java.io.tmpdir");
 				try {
 					File temp = File.createTempFile("NanoHTTPD", "", new File(tmpdir));
-					OutputStream fstream = new FileOutputStream(temp);
-					fstream.write(b, offset, len);
-					fstream.close();
+					myTmpFiles.record(temp);
+					ByteBuffer src = b.duplicate();
+					FileOutputStream destOut = new FileOutputStream(temp);
+					FileChannel dest = destOut.getChannel();
+					src.position(offset).limit(offset + len);
+					dest.write(src.slice());
 					path = temp.getAbsolutePath();
+					destOut.close();
 				} catch (Exception e) { // Catch exception if any
 					myErr.println("Error: " + e.getMessage());
 				}
@@ -673,17 +686,25 @@ public class NanoHTTPD
 			return path;
 		}
 
+		private RandomAccessFile getTmpBucket() throws IOException
+		{
+			String tmpdir = System.getProperty("java.io.tmpdir");
+			File temp = File.createTempFile("NanoHTTPD", "", new File(tmpdir));
+			myTmpFiles.record(temp);
+			return new RandomAccessFile(temp, "rw");
+		}
+
 
 		/**
 		 * It returns the offset separating multipart file headers
 		 * from the file's data.
 		**/
-		private int stripMultipartHeaders(byte[] b, int offset)
+		private int stripMultipartHeaders(ByteBuffer b, int offset)
 		{
 			int i = 0;
-			for (i=offset; i<b.length; i++)
+			for (i=offset; i<b.limit(); i++)
 			{
-				if (b[i] == '\r' && b[++i] == '\n' && b[++i] == '\r' && b[++i] == '\n')
+				if (b.get(i) == '\r' && b.get(++i) == '\n' && b.get(++i) == '\r' && b.get(++i) == '\n')
 					break;
 			}
 			return i+1;
@@ -780,7 +801,7 @@ public class NanoHTTPD
 
 				if ( header != null )
 				{
-					Enumeration e = header.keys();
+					Enumeration<Object> e = header.keys();
 					while ( e.hasMoreElements())
 					{
 						String key = (String)e.nextElement();
@@ -816,7 +837,23 @@ public class NanoHTTPD
 			}
 		}
 
+		private class TempFiles {
+			private List<File> mmFiles = new LinkedList<File>();
+
+			public void record(File file) {
+				mmFiles.add(file);
+			}
+
+			public void cleanup() {
+				for (File f : mmFiles) {
+					f.delete();
+				}
+				mmFiles.clear();
+			}
+		}
+
 		private Socket mySocket;
+		private TempFiles myTmpFiles = new TempFiles();
 	}
 
 	/**
@@ -836,9 +873,11 @@ public class NanoHTTPD
 				newUri += "%20";
 			else
 			{
-				newUri += URLEncoder.encode( tok );
-				// For Java 1.4 you'll want to use this instead:
-				// try { newUri += URLEncoder.encode( tok, "UTF-8" ); } catch ( java.io.UnsupportedEncodingException uee ) {}
+				try {
+					newUri += URLEncoder.encode( tok, "UTF-8" );
+				} catch ( java.io.UnsupportedEncodingException uee ) {
+					//TODO: report encoding error.
+				}
 			}
 		}
 		return newUri;
@@ -1055,7 +1094,7 @@ public class NanoHTTPD
 	/**
 	 * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE
 	 */
-	private static Hashtable theMimeTypes = new Hashtable();
+	private static Hashtable<String, String> theMimeTypes = new Hashtable<String, String>();
 	static
 	{
 		StringTokenizer st = new StringTokenizer(
