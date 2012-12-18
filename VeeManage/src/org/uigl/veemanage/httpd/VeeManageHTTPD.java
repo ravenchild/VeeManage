@@ -52,17 +52,19 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	public Response serve(String uri, String method, Properties header, Properties params, Properties files) {
 
 		VeeManage.LOGGER.logp(Level.INFO, VeeManageHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "URI:" + uri);
-		
+
 		Response page = new Response();
 		page.status = HTTP_OK;
 		page.mimeType = MIME_HTML;
 		cookiesToParams(header, params);
-		Session userSession = startSession(page, params);
 		
 		for (VeeManageHTTPPage pageClass : mPages) {
 			
 			try {
 				if (pageClass.hasMatch(uri, method)) {
+
+					Session userSession = startSession(page, params);
+					
 					pageClass.init(uri, method, header, params, files, userSession);
 					page.status = pageClass.getStatus();
 					//FIXME: Change these so they don't run twice.
@@ -112,7 +114,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 			ret = mSessions.findSession((String) params.get("SessionID"));
 		if (ret == null)
 			ret = mSessions.getNewSession();
-		r.addHeader("Set-Cookie", "SessionID=" + ret.getSessionID());
+		r.addHeader("Set-Cookie", "SessionID=" + ret.getSessionID() + "; Path=/; HttpOnly" + (isSecure() ? "; Secure" : ""));
 		return ret;
 	}
 	
