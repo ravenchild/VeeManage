@@ -1,7 +1,6 @@
 package org.uigl.veemanage;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
