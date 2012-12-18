@@ -1,1 +1,7 @@
 VeeManage
+
+To use SSL, you must create a keystore.
+
+$ keytool -keystore key.store -genkey -alias veemanage -keyalg RSA
+
+This will be included in the service initialization code later.
