@@ -338,6 +338,12 @@ public class NanoHTTPD
 				byte[] buf = new byte[bufsize];
 				int rlen = is.read(buf, 0, bufsize);
 				if (rlen <= 0) return;
+				if (rlen == 1 && myServerSocketSSL) {
+					is = mySocket.getInputStream();
+					if (is == null) return;
+					rlen += is.read(buf, 1, bufsize);
+					if (rlen <= 0) return;
+				}
 
 				// Create a BufferedReader for parsing the header.
 				ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
@@ -385,7 +391,7 @@ public class NanoHTTPD
 				// have reached the end of the data to be sent or we should
 				// expect the first byte of the body at the next read.
 				if (splitbyte < rlen)
-					size -= rlen - splitbyte +1;
+					size -= rlen - splitbyte + 1;
 				else if (!sbfound || size == 0x7FFFFFFFFFFFFFFFl)
 					size = 0;
 
@@ -490,10 +496,7 @@ public class NanoHTTPD
 				// Read the request line
 				String inLine = in.readLine();
 				if (inLine == null) return;
-				if (inLine.length() == 1 && myServerSocketSSL) {
-					in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
-					inLine = inLine + in.readLine();
-				}
+
 				StringTokenizer st = new StringTokenizer( inLine );
 				if ( !st.hasMoreTokens())
 					sendError( HTTP_BADREQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html" );
@@ -888,6 +891,10 @@ public class NanoHTTPD
 	private final boolean myServerSocketSSL;
 	private Thread myThread;
 	private File myRootDir;
+	
+	protected boolean isSecure() {
+		return myServerSocketSSL;
+	}
 
 	// ==================================================
 	// File server code
