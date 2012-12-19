@@ -83,16 +83,21 @@ public class Template {
 	            return c1;
 	        }
 	    }
-	    
+
+		@Override
+		public int read(byte[] b) throws IOException {
+			return read(b, 0, b.length);
+		}
+		
 		@Override
 		public int read(byte[] b, int off, int len) throws IOException {
-			if(len == 0)
-				return 0;
+			if(len == 0 || off >= len)
+				return -1;
 
 			int c, reads = 0;
-			while ((c = read()) >= 0 && (off + reads) < len) {
+			while ((off + reads) < len && (c = read()) >= 0)
 				b[off + reads++] = (byte) c;
-			}
+
 			return reads;
 		}
 		
