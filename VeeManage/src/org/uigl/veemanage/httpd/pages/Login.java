@@ -3,6 +3,7 @@ package org.uigl.veemanage.httpd.pages;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.uigl.veemanage.Settings;
 import org.uigl.veemanage.httpd.Session;
 import org.uigl.veemanage.httpd.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
@@ -78,6 +79,7 @@ public class Login implements VeeManageHTTPPage {
 	@Override
 	public InputStream getData() {
 		Session pageVars = new Session(null);
+		pageVars.put("app_name", Settings.DEFAULT_WWW_APP_NAME);
 		pageVars.put("title", "Login");
 		
 		//Handle errors

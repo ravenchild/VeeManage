@@ -1,0 +1,47 @@
+/*
+**
+*/
+
+body
+{
+	margin: 0px;
+}
+
+/*
+**	Banner Styles
+*/
+
+#banner
+{
+	background-image: url("/img/banner_bg.gif");
+	background-repeat: repeat-x;
+	color: #FFF;
+	height: 64px;
+	margin: 0px;
+}
+
+#banner p
+{
+	margin-top: 0px;
+	margin-left: 32px;
+	line-height: 64px;
+	font-size: 32px;
+}
+
+/*
+**	Login Styles
+*/
+
+#login
+{
+	border: 2px solid #000;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 100px;
+	width: 500px;
+}
+
+#login input
+{
+	border: 1px solid #c96565;
+}
