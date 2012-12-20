@@ -22,13 +22,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.LinkedList;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -97,7 +92,7 @@ public class NanoHTTPD
 	{
 		myOut.println( method + " '" + uri + "' " );
 
-		Enumeration<?> e = header.propertyNames();
+		Enumeration e = header.propertyNames();
 		while ( e.hasMoreElements())
 		{
 			String value = (String)e.nextElement();
@@ -334,15 +329,28 @@ public class NanoHTTPD
 				// Read the first 8192 bytes.
 				// The full header should fit in here.
 				// Apache's default header limit is 8KB.
-				int bufsize = 8192;
+				// Do NOT assume that a single read will get the entire header at once!
+				final int bufsize = 8192;
 				byte[] buf = new byte[bufsize];
-				int rlen = is.read(buf, 0, bufsize);
-				if (rlen <= 0) return;
-				if (rlen == 1 && myServerSocketSSL) {
-					is = mySocket.getInputStream();
-					if (is == null) return;
-					rlen += is.read(buf, 1, bufsize);
-					if (rlen <= 0) return;
+				int splitbyte = 0;
+				int rlen = 0;
+				{
+					int read = is.read(buf, 0, bufsize);
+					if (read <= 0) return;
+					if (read == 1 && myServerSocketSSL) {
+						is = mySocket.getInputStream();
+						if (is == null) return;
+						read += is.read(buf, 1, bufsize - 1);
+						if (read <= 0) return;
+					}
+					while (read > 0)
+					{
+						rlen += read;
+						splitbyte = findHeaderEnd(buf, rlen);
+						if (splitbyte > 0)
+							break;
+						read = is.read(buf, rlen, bufsize - rlen);
+					}
 				}
 
 				// Create a BufferedReader for parsing the header.
@@ -366,33 +374,20 @@ public class NanoHTTPD
 					catch (NumberFormatException ex) {}
 				}
 
-				// We are looking for the byte separating header from body.
-				// It must be the last byte of the first two sequential new lines.
-				int splitbyte = 0;
-				boolean sbfound = false;
-				while (splitbyte < rlen)
-				{
-					if (buf[splitbyte] == '\r' && buf[++splitbyte] == '\n' && buf[++splitbyte] == '\r' && buf[++splitbyte] == '\n') {
-						sbfound = true;
-						break;
-					}
-					splitbyte++;
-				}
-				splitbyte++;
-
 				// Write the part of body already read to ByteArrayOutputStream f
-				RandomAccessFile f = getTmpBucket();
-				if (splitbyte < rlen) f.write(buf, splitbyte, rlen-splitbyte);
+				ByteArrayOutputStream f = new ByteArrayOutputStream();
+				if (splitbyte < rlen)
+					f.write(buf, splitbyte, rlen-splitbyte);
 
 				// While Firefox sends on the first read all the data fitting
-				// our buffer, Chrome and Opera sends only the headers even if
-				// there is data for the body. So we do some magic here to find
+				// our buffer, Chrome and Opera send only the headers even if
+				// there is data for the body. We do some magic here to find
 				// out whether we have already consumed part of body, if we
 				// have reached the end of the data to be sent or we should
 				// expect the first byte of the body at the next read.
 				if (splitbyte < rlen)
-					size -= rlen - splitbyte + 1;
-				else if (!sbfound || size == 0x7FFFFFFFFFFFFFFFl)
+					size -= rlen-splitbyte+1;
+				else if (splitbyte==0 || size == 0x7FFFFFFFFFFFFFFFl)
 					size = 0;
 
 				// Now read all the body and write it to f
@@ -406,11 +401,10 @@ public class NanoHTTPD
 				}
 
 				// Get the raw body as a byte []
-				ByteBuffer fbuf = f.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, f.length());
-				f.seek(0);
+				byte [] fbuf = f.toByteArray();
 
 				// Create a BufferedReader for easily reading it as string.
-				InputStream bin = new FileInputStream(f.getFD());
+				ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
 				BufferedReader in = new BufferedReader( new InputStreamReader(bin));
 
 				// If the method is POST, there may be parameters
@@ -455,7 +449,7 @@ public class NanoHTTPD
 				}
 
 				if ( method.equalsIgnoreCase( "PUT" ))
-					files.put("content", saveTmpFile(fbuf, 0, fbuf.limit()));
+					files.put("content", saveTmpFile( fbuf, 0, f.size()));
 
 				// Ok, now do the serve()
 				Response r = serve( uri, method, header, parms, files );
@@ -479,10 +473,6 @@ public class NanoHTTPD
 			{
 				// Thrown by sendError, ignore and exit the thread.
 			}
-			finally
-			{
-				myTmpFiles.cleanup();
-			}
 		}
 
 		/**
@@ -496,7 +486,6 @@ public class NanoHTTPD
 				// Read the request line
 				String inLine = in.readLine();
 				if (inLine == null) return;
-
 				StringTokenizer st = new StringTokenizer( inLine );
 				if ( !st.hasMoreTokens())
 					sendError( HTTP_BADREQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html" );
@@ -546,7 +535,7 @@ public class NanoHTTPD
 		 * Decodes the Multipart Body data and put it
 		 * into java Properties' key - value pairs.
 		**/
-		private void decodeMultipartData(String boundary, ByteBuffer fbuf, BufferedReader in, Properties parms, Properties files)
+		private void decodeMultipartData(String boundary, byte[] fbuf, BufferedReader in, Properties parms, Properties files)
 			throws InterruptedException
 		{
 			try
@@ -626,15 +615,32 @@ public class NanoHTTPD
 		}
 
 		/**
+		 * Find byte index separating header from body.
+		 * It must be the last byte of the first two sequential new lines.
+		**/
+		private int findHeaderEnd(final byte[] buf, int rlen)
+		{
+			int splitbyte = 0;
+			while (splitbyte + 3 < rlen)
+			{
+				if (buf[splitbyte] == '\r' && buf[splitbyte + 1] == '\n' && buf[splitbyte + 2] == '\r' && buf[splitbyte + 3] == '\n')
+					return splitbyte + 4;
+				splitbyte++;
+			}
+			return 0;
+		}
+
+		/**
 		 * Find the byte positions where multipart boundaries start.
 		**/
-		public int[] getBoundaryPositions(ByteBuffer b, byte[] boundary)
+		public int[] getBoundaryPositions(byte[] b, byte[] boundary)
 		{
 			int matchcount = 0;
 			int matchbyte = -1;
-			Vector<Integer> matchbytes = new Vector<Integer>();
-			for (int i=0; i<b.limit(); i++) {
-				if (b.get(i) == boundary[matchcount])
+			Vector matchbytes = new Vector();
+			for (int i=0; i<b.length; i++)
+			{
+				if (b[i] == boundary[matchcount])
 				{
 					if (matchcount == 0)
 						matchbyte = i;
@@ -666,7 +672,7 @@ public class NanoHTTPD
 		 * to a temporary file.
 		 * The full path to the saved file is returned.
 		**/
-		private String saveTmpFile(ByteBuffer b, int offset, int len)
+		private String saveTmpFile(byte[] b, int offset, int len)
 		{
 			String path = "";
 			if (len > 0)
@@ -674,14 +680,10 @@ public class NanoHTTPD
 				String tmpdir = System.getProperty("java.io.tmpdir");
 				try {
 					File temp = File.createTempFile("NanoHTTPD", "", new File(tmpdir));
-					myTmpFiles.record(temp);
-					ByteBuffer src = b.duplicate();
-					FileOutputStream destOut = new FileOutputStream(temp);
-					FileChannel dest = destOut.getChannel();
-					src.position(offset).limit(offset + len);
-					dest.write(src.slice());
+					OutputStream fstream = new FileOutputStream(temp);
+					fstream.write(b, offset, len);
+					fstream.close();
 					path = temp.getAbsolutePath();
-					destOut.close();
 				} catch (Exception e) { // Catch exception if any
 					myErr.println("Error: " + e.getMessage());
 				}
@@ -689,25 +691,17 @@ public class NanoHTTPD
 			return path;
 		}
 
-		private RandomAccessFile getTmpBucket() throws IOException
-		{
-			String tmpdir = System.getProperty("java.io.tmpdir");
-			File temp = File.createTempFile("NanoHTTPD", "", new File(tmpdir));
-			myTmpFiles.record(temp);
-			return new RandomAccessFile(temp, "rw");
-		}
-
 
 		/**
 		 * It returns the offset separating multipart file headers
 		 * from the file's data.
 		**/
-		private int stripMultipartHeaders(ByteBuffer b, int offset)
+		private int stripMultipartHeaders(byte[] b, int offset)
 		{
 			int i = 0;
-			for (i=offset; i<b.limit(); i++)
+			for (i=offset; i<b.length; i++)
 			{
-				if (b.get(i) == '\r' && b.get(++i) == '\n' && b.get(++i) == '\r' && b.get(++i) == '\n')
+				if (b[i] == '\r' && b[++i] == '\n' && b[++i] == '\r' && b[++i] == '\n')
 					break;
 			}
 			return i+1;
@@ -804,7 +798,7 @@ public class NanoHTTPD
 
 				if ( header != null )
 				{
-					Enumeration<Object> e = header.keys();
+					Enumeration e = header.keys();
 					while ( e.hasMoreElements())
 					{
 						String key = (String)e.nextElement();
@@ -824,9 +818,9 @@ public class NanoHTTPD
 						int read = data.read( buff, 0, theBufferSize);
 						if (read <= 0)	break;
 						out.write( buff, 0, read );
-						out.flush();
 					}
 				}
+				out.flush();
 				out.close();
 				if ( data != null )
 					data.close();
@@ -838,23 +832,7 @@ public class NanoHTTPD
 			}
 		}
 
-		private class TempFiles {
-			private List<File> mmFiles = new LinkedList<File>();
-
-			public void record(File file) {
-				mmFiles.add(file);
-			}
-
-			public void cleanup() {
-				for (File f : mmFiles) {
-					f.delete();
-				}
-				mmFiles.clear();
-			}
-		}
-
 		private Socket mySocket;
-		private TempFiles myTmpFiles = new TempFiles();
 	}
 
 	/**
@@ -1099,7 +1077,7 @@ public class NanoHTTPD
 	/**
 	 * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE
 	 */
-	private static Hashtable<String, String> theMimeTypes = new Hashtable<String, String>();
+	private static Hashtable theMimeTypes = new Hashtable();
 	static
 	{
 		StringTokenizer st = new StringTokenizer(
