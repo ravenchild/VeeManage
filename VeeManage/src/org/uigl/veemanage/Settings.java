@@ -33,7 +33,7 @@ public class Settings {
 		
 		SQLiteConnection db = new SQLiteConnection(new File(SETTINGS_DATABASE_NAME));
 		db.open(true);
-		
+
 		// Cleanup
 		db.dispose();
 		
