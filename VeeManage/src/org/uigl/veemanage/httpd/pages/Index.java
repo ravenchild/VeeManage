@@ -1,10 +1,11 @@
 package org.uigl.veemanage.httpd.pages;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.uigl.veemanage.Settings;
 import org.uigl.veemanage.httpd.Session;
+import org.uigl.veemanage.httpd.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
 import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
 
@@ -15,6 +16,7 @@ public class Index implements VeeManageHTTPPage {
 	private int pFlags = VeeManageHTTPD.FLAG_NONE;
 	
 	private Session mUserSession = null;
+	private String mErrorText = null;
 	
 	@Override
 	public boolean hasMatch(String uri, String method) {
@@ -56,9 +58,14 @@ public class Index implements VeeManageHTTPPage {
 
 	@Override
 	public InputStream getData() {
-		StringBuilder data = new StringBuilder();
-		data.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head><title>VeeManage Index</title></head><body><h1>Index</h1><a href=\"/logout/\">Logout</a></body></html>");
-		return new ByteArrayInputStream(data.toString().getBytes());
+		Session pageVars = new Session(null);
+		pageVars.put("app_name", Settings.DEFAULT_WWW_APP_NAME);
+		pageVars.put("title", "Index");
+		
+		//Handle errors
+		pageVars.put("error_text", mErrorText == null ? "" : mErrorText);
+		
+		return Template.applyTemplate("/org/uigl/veemanage/httpd/templates/Index.html", pageVars);
 	}
 
 	@Override
