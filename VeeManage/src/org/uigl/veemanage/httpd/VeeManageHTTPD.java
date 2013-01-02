@@ -33,7 +33,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		public String getRedirectLocation();
 	}
 	
-	private final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[]{
+	private static final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[]{
 			new org.uigl.veemanage.httpd.pages.Index(),
 			new org.uigl.veemanage.httpd.pages.Logout(),
 			new org.uigl.veemanage.httpd.pages.Login()

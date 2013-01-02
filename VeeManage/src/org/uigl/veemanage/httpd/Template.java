@@ -101,6 +101,13 @@ public class Template {
 			return reads;
 		}
 		
+		@Override
+		public void close() throws IOException {
+			super.close();
+			mBuffer = null;
+			mArgs = null;
+		}
+		
 	}
 	
 }
