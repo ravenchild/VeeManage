@@ -25,6 +25,7 @@ public class VeeManage {
 				if (new File("key.store").exists()) {
 					System.setProperty("javax.net.ssl.keyStore", new File("key.store").getAbsolutePath());
 					System.setProperty("javax.net.ssl.keyStorePassword", "eLKTPWTlFvKz8Aos1dMvtNvlbxsP70PJeQkVdm4Qzzyj8o9hjetWOHwVbdupTng");
+					System.setProperty("javax.net.ssl.sessionCacheSize", "1000");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
