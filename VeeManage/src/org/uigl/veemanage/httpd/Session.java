@@ -10,6 +10,8 @@ public class Session {
 	private String mID;
 	private HashMap<String, Object> mVariables;
 	
+	private boolean mReturnToTop = false;
+	
 	public Session(String sessionID) {
 		this.mID = sessionID;
 		this.mVariables = new HashMap<String, Object>();
@@ -22,10 +24,33 @@ public class Session {
 	}
 	
 	/**
+	 * Set mReturnToTop
+	 */
+	public void setReturnToTop(boolean returnToTop) {
+		this.mReturnToTop = returnToTop;
+	}
+	
+	/**
+	 * Get mReturnToTop
+	 */
+	public boolean getReturnToTop() {
+		return this.mReturnToTop;
+	}
+	
+	/**
 	 * Removes all variables from the Session.
 	 */
 	public void clear() {
 		mVariables.clear();
+	}
+	
+	/**
+	 * Nulls the session vars.
+	 */
+	public void close() {
+		mVariables.clear();
+		mVariables = null;
+		mID = null;
 	}
 	
 	/**

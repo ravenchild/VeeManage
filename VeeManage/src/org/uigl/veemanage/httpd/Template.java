@@ -1,18 +1,41 @@
 package org.uigl.veemanage.httpd;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
 import org.uigl.veemanage.VeeManage;
 
 public class Template {
+	
+	private static HashMap<String, byte[]> TemplateCache = new HashMap<String, byte[]>();
 
 	public static InputStream applyTemplate(String resourceName, Session args) {
-		InputStream template =  ClassLoader.class.getResourceAsStream(resourceName);
+		InputStream template = getTemplateByteStream(resourceName);
 		return new Template.TemplateStream(template, args);
+	}
+		
+	private static InputStream getTemplateByteStream(String resourceName) {
+		byte[] templateBytes = TemplateCache.get(resourceName);
+		if (templateBytes == null) {
+			try {
+				int resourceLength = (int) new File(ClassLoader.class.getResource(resourceName).getFile()).length();
+				InputStream resourceStream = ClassLoader.class.getResourceAsStream(resourceName);
+				templateBytes = new byte[resourceLength];
+				resourceStream.read(templateBytes);
+				resourceStream.close();
+				TemplateCache.put(resourceName, templateBytes);
+			} catch (IOException e) {
+				e.printStackTrace();
+				VeeManage.LOGGER.logp(Level.SEVERE, TemplateStream.class.getName(), "getTemplateByteStream(String resourceName)", "IOException");
+			}
+		}
+		return new ByteArrayInputStream(templateBytes);
 	}
 	
 	private static class TemplateStream extends FilterInputStream {
@@ -62,7 +85,7 @@ public class Template {
 		            	incName.append((char) c2);
 		            
 		            try {
-			            InputStream template = ClassLoader.class.getResourceAsStream(incName.toString());
+			            InputStream template = getTemplateByteStream(incName.toString());
 			            TemplateStream includeStream =  new Template.TemplateStream(template, mArgs);
 			            int includeChar = includeStream.read();
 			            while (includeChar > 0) {

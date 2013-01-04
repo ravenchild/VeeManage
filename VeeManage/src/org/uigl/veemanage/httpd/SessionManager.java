@@ -1,13 +1,23 @@
 package org.uigl.veemanage.httpd;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 public class SessionManager {
 
 	private HashMap<String, Session> mSessions;
-	
+	private Stack<Session> mSessionPurge;
+	private int mMaxSessions = 10000;
+	private boolean mCanPurge = true;
+
 	public SessionManager() {
 		mSessions = new HashMap<String, Session>();
+		mSessionPurge = new Stack<Session>();
+	}
+	
+	public void setMaxSessions(int maxSessions) {
+		this.mMaxSessions = maxSessions;
+		mSessionPurge.ensureCapacity(maxSessions + 1);
 	}
 	
 	/**
@@ -16,11 +26,46 @@ public class SessionManager {
 	 * 
 	 * @return a Session object
 	 */
-	public Session getNewSession() {
+	public synchronized Session getNewSession() {
 		String newSessionID = java.util.UUID.randomUUID().toString();
 		Session newSession = new Session(newSessionID);
+		newSession.setReturnToTop(true);
 		mSessions.put(newSessionID, newSession);
+		mSessionPurge.push(newSession);
+		
+		if (mSessionPurge.size() > mMaxSessions && mCanPurge) {
+			mCanPurge = false;
+			new Thread(new purgeSessionsThread()).run();
+		}
+		
 		return newSession;
+	}
+	
+	private class purgeSessionsThread implements Runnable {
+
+		@Override
+		public void run() {
+			synchronized (mSessionPurge) {
+				Session baseSession = mSessionPurge.peek();
+				while (baseSession.getReturnToTop() == false) {
+					baseSession.close();
+					mSessions.remove(baseSession.getSessionID());
+					baseSession = mSessionPurge.pop();
+				}
+				do {
+					Session currentSession = mSessionPurge.pop();
+					if (currentSession.getReturnToTop()) {
+						mSessionPurge.push(currentSession);
+						currentSession.setReturnToTop(false);
+					} else {
+						currentSession.close();
+						mSessions.remove(currentSession.getSessionID());
+					}
+				} while (baseSession != mSessionPurge.peek());
+			}
+
+			mCanPurge = true;
+		}
 	}
 
 	
@@ -32,16 +77,10 @@ public class SessionManager {
 	 * @return a Session object, null
 	 */
 	public Session findSession(String sessionID) {
-		return mSessions.get(sessionID);
-	}
-	
-	/**
-	 * Removes the session with the associated sessionID.
-	 * 
-	 * @param sessionID
-	 */
-	public void removeSession(String sessionID) {
-		mSessions.remove(sessionID);
+		Session retSession = mSessions.get(sessionID);
+		if (retSession != null)
+			retSession.setReturnToTop(true);
+		return retSession;
 	}
 	
 }

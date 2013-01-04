@@ -46,6 +46,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		super(port, wwwroot);
 		this.mRoot = wwwroot;
 		this.mSessions = new SessionManager();
+		this.mSessions.setMaxSessions(1000);
 	}
 	
 	@Override
@@ -131,7 +132,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	}
 	
 	private Session removeSession(Session ses) {
-		mSessions.removeSession(ses.getSessionID());
+		ses.clear();
 		return null;
 	}
 	
