@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.BufferedOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLEncoder;
@@ -810,15 +810,16 @@ public class NanoHTTPD
 				if ( status == null )
 					throw new Error( "sendResponse(): Status can't be null." );
 
-				OutputStream out = mySocket.getOutputStream();
-				PrintWriter pw = new PrintWriter( out );
-				pw.print("HTTP/1.0 " + status + " \r\n");
+				BufferedOutputStream out = new BufferedOutputStream( mySocket.getOutputStream() );
+				StringBuilder sb = new StringBuilder();
+				
+				sb.append("HTTP/1.0 ").append(status).append(" \r\n");
 
 				if ( mime != null )
-					pw.print("Content-Type: " + mime + "\r\n");
+					sb.append("Content-Type: ").append(mime).append("\r\n");
 
 				if ( header == null || header.getProperty( "Date" ) == null )
-					pw.print( "Date: " + gmtFrmt.format( new Date()) + "\r\n");
+					sb.append("Date: ").append(gmtFrmt.format( new Date())).append("\r\n");
 
 				if ( header != null )
 				{
@@ -827,13 +828,17 @@ public class NanoHTTPD
 					{
 						String key = (String)e.nextElement();
 						String value = header.getProperty( key );
-						pw.print( key + ": " + value + "\r\n");
+						sb.append(key).append(": ").append(value).append("\r\n");
 					}
 				}
 
-				pw.print("\r\n");
-				pw.flush();
-
+				sb.append("\r\n");
+				
+				out.write(sb.toString().getBytes());
+				out.flush();
+				
+				sb = null;
+				
 				if ( data != null )
 				{
 					byte[] buff = new byte[theBufferSize];
@@ -842,6 +847,7 @@ public class NanoHTTPD
 						int read = data.read( buff, 0, theBufferSize);
 						if (read <= 0)	break;
 						out.write( buff, 0, read );
+						out.flush();
 					}
 				}
 				out.flush();
