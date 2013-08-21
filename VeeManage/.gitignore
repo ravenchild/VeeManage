@@ -1,7 +1,6 @@
 /bin
-/settings.db
-/key.store
-.DS_Store
-/bin
-/bin
 /dist
+settings.db
+key.store
+.DS_Store
+
