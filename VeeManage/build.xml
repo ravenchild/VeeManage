@@ -3,19 +3,19 @@
     <target name="clean">
 	    <delete file="dist/VeeManage.jar" />
 	    <delete dir="dist/wwwroot" />
-	    <delete dir="dist/libs" />
+	    <delete dir="dist/lib" />
     </target>
     
 	<target name="makejar" description="Create jar." >
 		<copy todir="dist/wwwroot">
 		    <fileset dir="wwwroot" />
 		</copy>
-		<copy todir="dist/libs">
-		    <fileset dir="libs" />
+		<copy todir="dist/lib">
+		    <fileset dir="lib" />
 		</copy>
 		
 		<path id="build-classpath">
-			 <fileset dir="libs">
+			 <fileset dir="lib">
 				<include name="*.jar" />
 			 </fileset>
 		</path>

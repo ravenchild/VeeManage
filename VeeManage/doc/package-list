@@ -1,0 +1,7 @@
+fi.iki.elonen.NanoHTTPD
+org.uigl.veemanage
+org.uigl.veemanage.httpd
+org.uigl.veemanage.httpd.pages
+org.uigl.veemanage.httpd.templates
+org.uigl.veemanage.supervisor
+org.uigl.veemanage.vm
