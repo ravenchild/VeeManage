@@ -15,6 +15,12 @@ public class SessionManager {
 		mSessionPurge = new Stack<Session>();
 	}
 	
+	/**
+	 * Sets the maximum number of sessions before purging old sessions.
+	 * Sessions are generally small so this number can be large.
+	 * 
+	 * @param maxSessions
+	 */
 	public void setMaxSessions(int maxSessions) {
 		this.mMaxSessions = maxSessions;
 		mSessionPurge.ensureCapacity(maxSessions + 1);
@@ -41,6 +47,13 @@ public class SessionManager {
 		return newSession;
 	}
 	
+	/**
+	 * Session purging occurs when the stack/hashmap are full.
+	 * Any non-recently used sessions are discarded.
+	 * 
+	 * @author Eric Roth
+	 *
+	 */
 	private class purgeSessionsThread implements Runnable {
 
 		@Override

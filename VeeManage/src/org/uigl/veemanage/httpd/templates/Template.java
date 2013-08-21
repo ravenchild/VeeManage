@@ -16,6 +16,13 @@ public class Template {
 	
 	private static HashMap<String, byte[]> TemplateCache = new HashMap<String, byte[]>();
 
+	/**
+	 * Apply specific arguments to a given template name.
+	 * 
+	 * @param resourceName
+	 * @param args
+	 * @return The templated InputStream
+	 */
 	public static InputStream applyTemplate(String resourceName, Session args) {
 		InputStream template = getTemplateByteStream(resourceName);
 		return new Template.TemplateStream(template, args);

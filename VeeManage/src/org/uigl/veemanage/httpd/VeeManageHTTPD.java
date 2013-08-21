@@ -22,6 +22,13 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	public static final int FLAG_FILE = 4;
 	public static final int FLAG_NO_CACHE = 8;
 	
+	/**
+	 * Interface for all pages available for the HTTPD.
+	 * Examples are located in <b>org.uigl.veemanage.httpd.pages.
+	 * 
+	 * @author Eric Roth
+	 *
+	 */
 	public interface VeeManageHTTPPage {
 		public boolean hasMatch(String uri, String method);
 		public void init(String uri, String method, Properties headers, Properties params, Properties files, Session userSession);
@@ -33,6 +40,12 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		public String getRedirectLocation();
 	}
 	
+	/**
+	 * List the pages for the HTTPD here.
+	 * The pages should be stateless classes.
+	 * These classes are reused even for different users.
+	 * 
+	 */
 	private static final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[]{
 			new org.uigl.veemanage.httpd.pages.Index(),
 			new org.uigl.veemanage.httpd.pages.Logout(),
@@ -42,6 +55,13 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	private File mRoot;
 	private SessionManager mSessions;
 	
+	/**
+	 * Start a new HTTPD.
+	 * 
+	 * @param port
+	 * @param wwwroot
+	 * @throws IOException
+	 */
 	public VeeManageHTTPD(int port, File wwwroot) throws IOException {
 		super(port, wwwroot);
 		this.mRoot = wwwroot;
@@ -100,6 +120,12 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		return super.serveFile(uri, header, this.mRoot, false);
 	}
 	
+	/**
+	 * Converts any client cookies into an accessible Properties class.
+	 * 
+	 * @param header
+	 * @param params
+	 */
 	private static void cookiesToParams(Properties header, Properties params) {
 		if (header.containsKey("cookie")) {
 			String cookieString = (String) header.get("cookie");
@@ -109,6 +135,13 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		}
 	}
 	
+	/**
+	 * Generates a new session or returns an existing session for a given sessionID.
+	 * 
+	 * @param r
+	 * @param params
+	 * @return The Session variable.
+	 */
 	private Session startSession(Response r, Properties params) {
 		Session ret = null;
 		if (params.containsKey("SessionID"))
@@ -119,6 +152,12 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		return ret;
 	}
 	
+	/**
+	 * Creates a redirect header when a page has the REDIRECT flag set.
+	 * 
+	 * @param res
+	 * @param location
+	 */
 	public static void redirectHeader(Response res, String location) {
 		res.status = HTTP_REDIRECT;
 		res.mimeType = MIME_HTML;
@@ -126,16 +165,35 @@ public class VeeManageHTTPD extends NanoHTTPD {
 		res.data = new ByteArrayInputStream(("<html><body>Redirecting.<br />Click <a href=\"" + location + "\">Here</a> if you are not automatically redirected.</body></html>").getBytes());
 	}
 	
+	/**
+	 * Prevents the response from being cached.
+	 *  
+	 * @param res
+	 */
 	public static void noCacheHeader(Response res) {
 		res.addHeader("Cache-Control", "no-cache, must-revalidate");
 		res.addHeader("Expires", "Sat, 26 Jul 1997 05:00:00 GMT");
 	}
 	
+	/**
+	 * Removes a session.
+	 * Let purge handle everything unless the user is logging out.
+	 * 
+	 * @param ses
+	 * @return null
+	 */
 	private Session removeSession(Session ses) {
 		ses.clear();
 		return null;
 	}
 	
+	/**
+	 * Utility function to divert the printing of a stack trace.
+	 * Should be moved at some point.
+	 * 
+	 * @param aThrowable
+	 * @return The throwable's stack trace.
+	 */
 	public static String getStackTrace(Throwable aThrowable) {
 		final Writer result = new StringWriter();
 		final PrintWriter printWriter = new PrintWriter(result);

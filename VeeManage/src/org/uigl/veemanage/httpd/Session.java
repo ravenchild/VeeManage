@@ -12,6 +12,12 @@ public class Session {
 	
 	private boolean mReturnToTop = false;
 	
+	/**
+	 * Creates a new session with sessionID.
+	 * Use <b>null</b> if temporary storage.
+	 * 
+	 * @param sessionID
+	 */
 	public Session(String sessionID) {
 		this.mID = sessionID;
 		this.mVariables = new HashMap<String, Object>();
@@ -19,19 +25,24 @@ public class Session {
 			VeeManage.LOGGER.logp(Level.INFO, Session.class.getName(), "Session(UUID id)", "New Session (" + (sessionID == null ? "null" : sessionID) + ")");
 	}
 	
+	/**
+	 * Gets the sessionID, can be null.
+	 * 
+	 * @return The sessionID
+	 */
 	public String getSessionID() {
 		return mID;
 	}
 	
 	/**
-	 * Set mReturnToTop
+	 * Set mReturnToTop. Used in the purging process.
 	 */
 	public void setReturnToTop(boolean returnToTop) {
 		this.mReturnToTop = returnToTop;
 	}
 	
 	/**
-	 * Get mReturnToTop
+	 * Get mReturnToTop. Used in the purging process.
 	 */
 	public boolean getReturnToTop() {
 		return this.mReturnToTop;
