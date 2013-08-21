@@ -1,9 +1,2 @@
-/libsqlite4java-android-armv7.so
-/libsqlite4java-linux-amd64.so
-/libsqlite4java-linux-i386.so
-/libsqlite4java-osx-10.4.jnilib
-/libsqlite4java-osx-ppc.jnilib
-/libsqlite4java-osx.jnilib
-/sqlite4java-win32-x64.dll
-/sqlite4java-win32-x86.dll
-/sqlite4java.jar
+*
+
