@@ -32,6 +32,7 @@ public class Login implements VeeManageHTTPPage {
 		pRedirect = "/";
 		pStatus = VeeManageHTTPD.HTTP_OK;
 		pFlags = VeeManageHTTPD.FLAG_NONE;
+		mErrorText = null;
 		
 		mUserSession = userSession;
 		
