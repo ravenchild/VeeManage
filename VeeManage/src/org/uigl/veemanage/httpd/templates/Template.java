@@ -1,4 +1,4 @@
-package org.uigl.veemanage.httpd;
+package org.uigl.veemanage.httpd.templates;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 
 import org.uigl.veemanage.VeeManage;
+import org.uigl.veemanage.httpd.Session;
 
 public class Template {
 	
@@ -24,9 +25,8 @@ public class Template {
 		byte[] templateBytes = TemplateCache.get(resourceName);
 		if (templateBytes == null) {
 			try {
-				int resourceLength = (int) new File(ClassLoader.class.getResource(resourceName).getFile()).length();
-				InputStream resourceStream = ClassLoader.class.getResourceAsStream(resourceName);
-				templateBytes = new byte[resourceLength];
+				InputStream resourceStream = Template.class.getResourceAsStream(resourceName);
+				templateBytes = new byte[resourceStream.available()];
 				resourceStream.read(templateBytes);
 				resourceStream.close();
 				TemplateCache.put(resourceName, templateBytes);

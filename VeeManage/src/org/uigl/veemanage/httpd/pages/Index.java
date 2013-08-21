@@ -5,12 +5,14 @@ import java.util.Properties;
 
 import org.uigl.veemanage.Settings;
 import org.uigl.veemanage.httpd.Session;
-import org.uigl.veemanage.httpd.Template;
+import org.uigl.veemanage.httpd.templates.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
 import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
 
 public class Index implements VeeManageHTTPPage {
 
+	private static final String TEMPLATE_NAME = "Index.html";
+	
 	private String pRedirect = "/login/";
 	private String pStatus = VeeManageHTTPD.HTTP_OK;
 	private int pFlags = VeeManageHTTPD.FLAG_NONE;
@@ -64,8 +66,8 @@ public class Index implements VeeManageHTTPPage {
 		
 		//Handle errors
 		pageVars.put("error_text", mErrorText == null ? "" : mErrorText);
-		
-		return Template.applyTemplate("/org/uigl/veemanage/httpd/templates/Index.html", pageVars);
+
+		return Template.applyTemplate(TEMPLATE_NAME, pageVars);
 	}
 
 	@Override

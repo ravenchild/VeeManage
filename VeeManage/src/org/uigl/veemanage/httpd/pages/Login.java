@@ -5,11 +5,13 @@ import java.util.Properties;
 
 import org.uigl.veemanage.Settings;
 import org.uigl.veemanage.httpd.Session;
-import org.uigl.veemanage.httpd.Template;
+import org.uigl.veemanage.httpd.templates.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
 import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
 
 public class Login implements VeeManageHTTPPage {
+	
+	private static final String TEMPLATE_NAME = "Login.html";
 
 	private String pRedirect = "/";
 	private String pStatus = VeeManageHTTPD.HTTP_OK;
@@ -84,8 +86,8 @@ public class Login implements VeeManageHTTPPage {
 		
 		//Handle errors
 		pageVars.put("error_text", mErrorText == null ? "" : mErrorText);
-		
-		return Template.applyTemplate("/org/uigl/veemanage/httpd/templates/Login.html", pageVars);
+
+		return Template.applyTemplate(TEMPLATE_NAME, pageVars);
 	}
 
 	@Override

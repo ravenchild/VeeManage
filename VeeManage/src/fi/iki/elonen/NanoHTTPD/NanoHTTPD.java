@@ -898,7 +898,7 @@ public class NanoHTTPD
 	private Thread myThread;
 	private File myRootDir;
 	
-	protected boolean isSecure() {
+	public boolean isSecure() {
 		return myServerSocketSSL;
 	}
 

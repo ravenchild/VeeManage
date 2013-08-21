@@ -1,6 +1,7 @@
 package org.uigl.veemanage;
 
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
@@ -22,7 +23,7 @@ public class VeeManage {
 		
 		if (Settings.DEFAULT_WWW_SSL) {
 			try {
-				if (new File("key..store").exists()) {
+				if (new File("key.store").exists()) {
 					System.setProperty("javax.net.ssl.keyStore", new File("key.store").getAbsolutePath());
 					System.setProperty("javax.net.ssl.keyStorePassword", "eLKTPWTlFvKz8Aos1dMvtNvlbxsP70PJeQkVdm4Qzzyj8o9hjetWOHwVbdupTng");
 					System.setProperty("javax.net.ssl.sessionCacheSize", "1000");
@@ -33,7 +34,13 @@ public class VeeManage {
 		}
 		
 		try {
-			new VeeManageHTTPD( Settings.DEFAULT_WWW_PORT, new File(Settings.DEFAULT_WWW_ROOT).getAbsoluteFile());
+			VeeManageHTTPD httpd = new VeeManageHTTPD( Settings.DEFAULT_WWW_PORT, new File(Settings.DEFAULT_WWW_ROOT).getAbsoluteFile());
+			
+			if (httpd.isSecure())
+				LOGGER.log(Level.INFO, "Using HTTPS on port " + Settings.DEFAULT_WWW_PORT + ".");
+			else
+				LOGGER.log(Level.INFO, "Using HTTP on port " + Settings.DEFAULT_WWW_PORT + ".");
+			
 		} catch(Exception e) {
 			System.err.println( "Couldn't start server:\n" + e );
 			System.exit( -1 );

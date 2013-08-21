@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="VeeManage.makejar" default="makejar" basedir=".">
+    <target name="clean">
+	    <delete file="dist/VeeManage.jar" />
+	    <delete dir="dist/wwwroot" />
+	    <delete dir="dist/libs" />
+    </target>
+    
+	<target name="makejar" description="Create jar." >
+		<copy todir="dist/wwwroot">
+		    <fileset dir="wwwroot" />
+		</copy>
+		<copy todir="dist/libs">
+		    <fileset dir="libs" />
+		</copy>
+		
+		<path id="build-classpath">
+			 <fileset dir="libs">
+				<include name="*.jar" />
+			 </fileset>
+		</path>
+		
+		<manifestclasspath property="lib.list" jarfile="${jar.file}">
+			<classpath refid="build-classpath" />
+		</manifestclasspath>
+		
+		<jar jarfile="dist/VeeManage.jar" basedir="bin">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Implementation-Vendor" value="UIGL" />
+				<attribute name="Implementation-Title" value="VeeManage" />
+				<attribute name="Implementation-Version" value="0.0.1" />
+				<attribute name="Main-class" value="org.uigl.veemanage.VeeManage" />
+				<attribute name="Class-Path" value=". ${lib.list}" />
+			</manifest>
+		</jar>
+	</target>
+</project>

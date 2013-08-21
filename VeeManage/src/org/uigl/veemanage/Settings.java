@@ -22,7 +22,7 @@ public class Settings {
 	 * HTTPD specific defaults.
 	 */
 	public static final String DEFAULT_WWW_ROOT = "wwwroot";
-	public static final int DEFAULT_WWW_PORT = 30183;
+	public static final int DEFAULT_WWW_PORT = 39183;
 	public static final boolean DEFAULT_WWW_SSL = true;
 	public static final String DEFAULT_WWW_APP_NAME = "VeeManage";
 	
