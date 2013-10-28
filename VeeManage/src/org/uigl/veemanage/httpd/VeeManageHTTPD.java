@@ -23,33 +23,16 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	public static final int FLAG_NO_CACHE = 8;
 	
 	/**
-	 * Interface for all pages available for the HTTPD.
-	 * Examples are located in <b>org.uigl.veemanage.httpd.pages.
-	 * 
-	 * @author Eric Roth
-	 *
-	 */
-	public interface VeeManageHTTPPage {
-		public boolean hasMatch(String uri, String method);
-		public void init(String uri, String method, Properties headers, Properties params, Properties files, Session userSession);
-		public String getStatus();
-		public String getMimeType();
-		public Properties getHeaders();
-		public InputStream getData();
-		public int getFlags();
-		public String getRedirectLocation();
-	}
-	
-	/**
 	 * List the pages for the HTTPD here.
 	 * The pages should be stateless classes.
 	 * These classes are reused even for different users.
 	 * 
 	 */
-	private static final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[]{
-			new org.uigl.veemanage.httpd.pages.Index(),
-			new org.uigl.veemanage.httpd.pages.Logout(),
-			new org.uigl.veemanage.httpd.pages.Login()
+	private static final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[] {
+		new org.uigl.veemanage.httpd.pages.Index(),
+		new org.uigl.veemanage.httpd.pages.Logout(),
+		new org.uigl.veemanage.httpd.pages.Login(),
+		new org.uigl.veemanage.httpd.pages.SettingsPage()
 	};
 	
 	private File mRoot;
@@ -84,17 +67,25 @@ public class VeeManageHTTPD extends NanoHTTPD {
 			try {
 				if (pageClass.hasMatch(uri, method)) {
 
+					VeeManage.LOGGER.logp(Level.INFO, VeeManageHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Page:" + pageClass.getPageClassName());
+
 					Session userSession = startSession(page, params);
 					
 					pageClass.init(uri, method, header, params, files, userSession);
 					page.status = pageClass.getStatus();
+					
 					//FIXME: Change these so they don't run twice.
-					if (pageClass.getMimeType() != null)
-						page.mimeType = pageClass.getMimeType();
-					if (pageClass.getHeaders() != null)
-						page.header = pageClass.getHeaders();
-					if (pageClass.getData() != null)
-						page.data = pageClass.getData();
+					String mimeTypeString = pageClass.getMimeType();
+					if (mimeTypeString != null)
+						page.mimeType = mimeTypeString;
+					
+					Properties headerProperties = pageClass.getHeaders();
+					if (headerProperties != null)
+						page.header = headerProperties;
+					
+					InputStream dataStream = pageClass.getData();
+					if (dataStream != null)
+						page.data = dataStream;
 					else
 						page.data = new ByteArrayInputStream("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head></head><body></body></html>".getBytes());
 

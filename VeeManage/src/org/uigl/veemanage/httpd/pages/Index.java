@@ -3,15 +3,20 @@ package org.uigl.veemanage.httpd.pages;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.uigl.veemanage.Settings;
+import org.uigl.veemanage.settings.SettingsManager;
 import org.uigl.veemanage.httpd.Session;
 import org.uigl.veemanage.httpd.templates.Template;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
+import org.uigl.veemanage.httpd.VeeManageHTTPPage;
 
 public class Index implements VeeManageHTTPPage {
 
 	private static final String TEMPLATE_NAME = "Index.html";
+	
+	@Override
+	public String getPageClassName() {
+		return "Index";
+	}
 	
 	private String pRedirect = "/login/";
 	private String pStatus = VeeManageHTTPD.HTTP_OK;
@@ -61,7 +66,7 @@ public class Index implements VeeManageHTTPPage {
 	@Override
 	public InputStream getData() {
 		Session pageVars = new Session(null);
-		pageVars.put("app_name", Settings.DEFAULT_WWW_APP_NAME);
+		pageVars.put("app_name", SettingsManager.DEFAULT_WWW_APP_NAME);
 		pageVars.put("title", "Index");
 		
 		//Handle errors

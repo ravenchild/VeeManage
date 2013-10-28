@@ -5,9 +5,14 @@ import java.util.Properties;
 
 import org.uigl.veemanage.httpd.Session;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.httpd.VeeManageHTTPD.VeeManageHTTPPage;
+import org.uigl.veemanage.httpd.VeeManageHTTPPage;
 
 public class Logout implements VeeManageHTTPPage {
+	
+	@Override
+	public String getPageClassName() {
+		return "Logout";
+	}
 	
 	@Override
 	public boolean hasMatch(String uri, String method) {

@@ -1,15 +1,15 @@
 package org.uigl.veemanage.supervisor;
 
-import org.uigl.veemanage.Settings;
+import org.uigl.veemanage.settings.SettingsManager;
 import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.vm.VeeManageControl;
+import org.uigl.veemanage.vm.VirtManager;
 
 public class VeeManageSupervisor {
 	
-	private Settings mSettings;
+	private SettingsManager mSettingsManager;
 	
 	private VeeManageHTTPD mHTTPD;
-	private VeeManageControl mControl;
+	private VirtManager mVirtManager;
 	
 	public VeeManageSupervisor() {
 		

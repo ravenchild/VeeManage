@@ -1,18 +1,104 @@
 package org.uigl.veemanage.httpd;
 
 import java.util.HashMap;
-import java.util.Stack;
+import java.util.logging.Level;
+
+import org.uigl.veemanage.VeeManage;
 
 public class SessionManager {
 
+	private class PurgeList {
+		
+		private class PurgeItem {
+			PurgeItem next;
+			Session session;
+			PurgeItem prev;
+			
+			public PurgeItem(Session session, PurgeItem mLast) {
+				this.next = null;
+				this.session = session;
+				this.prev = mLast;
+			}
+		}
+		
+		private PurgeItem mFirst = null;
+		private PurgeItem mLast = null;
+		private int mSize = 0;
+		
+		private PurgeItem getOrMendNext(PurgeItem item) {
+			if (item == null)
+				return null;
+			if (item.session == null) {
+				mSize--;
+				PurgeItem replace = getOrMendNext(item.next);
+				replace.prev = item.prev;
+				if (item.prev != null)
+					item.prev.next = replace;
+
+				if (mFirst == item)
+					mFirst = replace;
+				if (mLast == item)
+					mLast = item.prev;
+				
+				return replace;
+			}
+			
+			return item;
+		}
+		
+		private void removeAndMend(PurgeItem item) {
+			PurgeItem nextItem = getOrMendNext(item.next);
+			PurgeItem previousItem = item.prev;
+			if (nextItem != null)
+				nextItem.prev = previousItem;
+			if (previousItem != null)
+				previousItem.next = nextItem;
+			
+			if (mFirst == item)
+				mFirst = nextItem;
+			if (mLast == item)
+				mLast = item.prev;
+			
+			mSize--;
+		}
+		
+		public int doPurge() {
+			int purged = 0;
+			PurgeItem current = mFirst;
+			while (getOrMendNext(current) != null) {
+				if (current.session.getReturnToTop()) {
+					current.session.setReturnToTop(false);
+				}
+				else {
+					purged++;
+					removeAndMend(current);
+				}
+				current = current.next;
+			}
+			return purged;
+		}
+		
+		public Session addPurgeSession(Session item) {
+			mSize++;
+			if (mLast != null)
+				return (mLast = mLast.next = new PurgeItem(item, mLast)).session;
+			else
+				return (mFirst = mLast = new PurgeItem(item, null)).session;
+		}
+		
+		public int size() {
+			return mSize;
+		}
+	}
+	
 	private HashMap<String, Session> mSessions;
-	private Stack<Session> mSessionPurge;
+	private PurgeList mSessionPurge;
 	private int mMaxSessions = 10000;
 	private boolean mCanPurge = true;
-
+	
 	public SessionManager() {
 		mSessions = new HashMap<String, Session>();
-		mSessionPurge = new Stack<Session>();
+		mSessionPurge = new PurgeList();
 	}
 	
 	/**
@@ -23,7 +109,6 @@ public class SessionManager {
 	 */
 	public void setMaxSessions(int maxSessions) {
 		this.mMaxSessions = maxSessions;
-		mSessionPurge.ensureCapacity(maxSessions + 1);
 	}
 	
 	/**
@@ -36,8 +121,11 @@ public class SessionManager {
 		String newSessionID = java.util.UUID.randomUUID().toString();
 		Session newSession = new Session(newSessionID);
 		newSession.setReturnToTop(true);
+		
+
+		
 		mSessions.put(newSessionID, newSession);
-		mSessionPurge.push(newSession);
+		mSessionPurge.addPurgeSession(newSession);
 		
 		if (mSessionPurge.size() > mMaxSessions && mCanPurge) {
 			mCanPurge = false;
@@ -58,26 +146,10 @@ public class SessionManager {
 
 		@Override
 		public void run() {
-			synchronized (mSessionPurge) {
-				Session baseSession = mSessionPurge.peek();
-				while (baseSession.getReturnToTop() == false) {
-					baseSession.close();
-					mSessions.remove(baseSession.getSessionID());
-					baseSession = mSessionPurge.pop();
-				}
-				do {
-					Session currentSession = mSessionPurge.pop();
-					if (currentSession.getReturnToTop()) {
-						mSessionPurge.push(currentSession);
-						currentSession.setReturnToTop(false);
-					} else {
-						currentSession.close();
-						mSessions.remove(currentSession.getSessionID());
-					}
-				} while (baseSession != mSessionPurge.peek());
-			}
-
+			int purged = mSessionPurge.doPurge();
 			mCanPurge = true;
+			
+			VeeManage.LOGGER.logp(Level.INFO, purgeSessionsThread.class.getName(), "run()", "Purged " + String.valueOf(purged) + " sessions.");
 		}
 	}
 

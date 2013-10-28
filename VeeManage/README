@@ -1,7 +1,25 @@
 VeeManage
 
+------------------------
+--        SSL         --
+------------------------
+
 To use SSL, you must create a keystore.
 
 $ keytool -keystore key.store -genkey -alias veemanage -keyalg RSA
 
 This will be included in the service initialization code later.
+
+
+------------------------
+--       Mac OS       --
+------------------------
+
+There is an issue with the OS configuration that limits the number 
+of open ports to about 16384. To double this, change the port range 
+from 49152:65536 to 32768:65536. Only do this if you expect to use 
+the full port range.  Unless you are benchmarking, this is useless.
+
+sudo sysctl -w net.inet.ip.portrange.first=32768
+sudo sysctl -w net.inet.ip.portrange.hifirst=32768
+

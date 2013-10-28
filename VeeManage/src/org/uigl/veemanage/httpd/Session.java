@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import org.uigl.veemanage.VeeManage;
 
 public class Session {
+	
 	private String mID;
 	private HashMap<String, Object> mVariables;
 	

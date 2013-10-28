@@ -472,6 +472,8 @@ public class NanoHTTPD
 
 				if ( method.equalsIgnoreCase( "PUT" ))
 					files.put("content", saveTmpFile( fbuf, 0, f.size()));
+				
+				f.close();
 
 				// Ok, now do the serve()
 				Response r = serve( uri, method, header, parms, files );
