@@ -24,4 +24,10 @@ public class SettingsDatabase extends Database<SQLiteDriver> {
 		return 0;
 	}
 
+	@Override
+	public void onUpgrade(int previousVersion, int newVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
