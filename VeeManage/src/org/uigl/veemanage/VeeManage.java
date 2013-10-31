@@ -1,6 +1,7 @@
 package org.uigl.veemanage;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.uigl.logger.UIGLLog;
 import org.uigl.veemanage.settings.SettingsManager;
@@ -13,11 +14,18 @@ public class VeeManage {
 	private static SettingsManager VeeManageSettings;
 	
 	public static void main(String[] args) {
+		
 		System.out.println("VeeManage 0.0.1");
 		try {
 			VeeManageSettings = SettingsManager.getSettingsFromDB();
 		} catch (SQLiteException e1) {
 			e1.printStackTrace();
+		}
+		
+		try {
+			UIGLLog.logToFile(SettingsManager.DEFAULT_LOG_FILE);
+		} catch (IOException e2) {
+			UIGLLog.w("Could not open log file.");
 		}
 		
 		if (SettingsManager.DEFAULT_WWW_SSL) {
