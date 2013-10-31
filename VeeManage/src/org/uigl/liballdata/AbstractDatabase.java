@@ -1,35 +1,13 @@
-package org.uigl.veemanage.db;
+package org.uigl.liballdata;
 
 import java.util.ArrayList;
 
-public abstract class Database<DriverClass extends DatabaseDriver> {
-
-	public enum DataTypes {
-		INTEGER, REAL, TEXT, BLOB, NULL;
-	}
-
-	/**
-	 * Used in changing the conflict resolution strategy of the database.
-	 * 
-	 * @author Eric Roth
-	 */
-	public enum Conflicts {
-
-		CONFLICT_NONE(""), CONFLICT_ROLLBACK(" OR ROLLBACK "), CONFLICT_ABORT(
-				" OR ABORT "), CONFLICT_FAIL(" OR FAIL "), CONFLICT_IGNORE(
-				" OR IGNORE "), CONFLICT_REPLACE(" OR REPLACE ");
-
-		public final String ConflictValue;
-
-		private Conflicts(String conflictValue) {
-			this.ConflictValue = conflictValue;
-		}
-	}
+public abstract class AbstractDatabase<DriverClass extends DatabaseDriver> implements Database {
 
 	private DriverClass mConnection;
 	private ArrayList<Table> mTables;
 
-	protected void addTables(Table... tables) {
+	public void addTables(Table... tables) {
 		if (tables == null)
 			return;
 		for (Table table : tables)
@@ -37,7 +15,7 @@ public abstract class Database<DriverClass extends DatabaseDriver> {
 				this.mTables.add(table);
 	}
 
-	private Table getTable(String tableName) {
+	public Table getTable(String tableName) {
 		for (Table table : mTables)
 			if (table.getTableName().equals(tableName))
 				return table;

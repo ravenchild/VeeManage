@@ -1,26 +1,26 @@
-package org.uigl.veemanage.httpd.pages;
+package org.uigl.veemanage.webgui.pages;
 
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.uigl.veemanage.settings.SettingsManager;
-import org.uigl.veemanage.httpd.Session;
-import org.uigl.veemanage.httpd.templates.Template;
-import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.httpd.VeeManageHTTPPage;
+import org.uigl.webgui.Session;
+import org.uigl.webgui.WebGuiHTTPD;
+import org.uigl.webgui.WebGuiHTTPPage;
+import org.uigl.webgui.templates.Template;
 
-public class Index implements VeeManageHTTPPage {
+public class SettingsPage implements WebGuiHTTPPage {
 
-	private static final String TEMPLATE_NAME = "Index.html";
+	private static final String TEMPLATE_NAME = "Settings.html";
 	
 	@Override
 	public String getPageClassName() {
-		return "Index";
+		return "Settings";
 	}
 	
 	private String pRedirect = "/login/";
-	private String pStatus = VeeManageHTTPD.HTTP_OK;
-	private int pFlags = VeeManageHTTPD.FLAG_NONE;
+	private String pStatus = WebGuiHTTPD.HTTP_OK;
+	private int pFlags = WebGuiHTTPD.FLAG_NONE;
 	
 	private Session mUserSession = null;
 	private String mErrorText = null;
@@ -34,15 +34,15 @@ public class Index implements VeeManageHTTPPage {
 	public void init(String uri, String method, Properties headers, Properties params, Properties files, Session userSession) {
 		// Reset all page vars.
 		pRedirect = "/login/";
-		pStatus = VeeManageHTTPD.HTTP_OK;
-		pFlags = VeeManageHTTPD.FLAG_NONE;
+		pStatus = WebGuiHTTPD.HTTP_OK;
+		pFlags = WebGuiHTTPD.FLAG_NONE;
 		
 		mUserSession = userSession;
 		
 		if (!mUserSession.getBoolean("UserAuthenticated", false)) {
 			pRedirect = "/login/";
-			pStatus = VeeManageHTTPD.HTTP_OK;
-			pFlags |= VeeManageHTTPD.FLAG_REDIRECT;
+			pStatus = WebGuiHTTPD.HTTP_OK;
+			pFlags |= WebGuiHTTPD.FLAG_REDIRECT;
 			return;
 		}
 			
@@ -55,7 +55,7 @@ public class Index implements VeeManageHTTPPage {
 
 	@Override
 	public String getMimeType() {
-		return VeeManageHTTPD.MIME_HTML;
+		return WebGuiHTTPD.MIME_HTML;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class Index implements VeeManageHTTPPage {
 	public InputStream getData() {
 		Session pageVars = new Session(null);
 		pageVars.put("app_name", SettingsManager.DEFAULT_WWW_APP_NAME);
-		pageVars.put("title", "Index");
+		pageVars.put("title", "Settings");
 		
 		//Handle errors
 		pageVars.put("error_text", mErrorText == null ? "" : mErrorText);

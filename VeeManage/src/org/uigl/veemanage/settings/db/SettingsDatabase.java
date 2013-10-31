@@ -1,10 +1,10 @@
 package org.uigl.veemanage.settings.db;
 
-import org.uigl.veemanage.db.Database;
-import org.uigl.veemanage.db.drivers.SQLiteDriver;
+import org.uigl.liballdata.AbstractDatabase;
+import org.uigl.liballdata.drivers.SQLiteDriver;
 import org.uigl.veemanage.settings.SettingsManager;
 
-public class SettingsDatabase extends Database<SQLiteDriver> {
+public class SettingsDatabase extends AbstractDatabase<SQLiteDriver> {
 
 	public static final String DATABASE_NAME = SettingsManager.SETTINGS_DATABASE_NAME;
 

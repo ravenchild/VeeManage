@@ -1,15 +1,15 @@
-package org.uigl.veemanage.httpd.pages;
+package org.uigl.veemanage.webgui.pages;
 
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.uigl.veemanage.settings.SettingsManager;
-import org.uigl.veemanage.httpd.Session;
-import org.uigl.veemanage.httpd.templates.Template;
-import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.httpd.VeeManageHTTPPage;
+import org.uigl.webgui.Session;
+import org.uigl.webgui.WebGuiHTTPD;
+import org.uigl.webgui.WebGuiHTTPPage;
+import org.uigl.webgui.templates.Template;
 
-public class Login implements VeeManageHTTPPage {
+public class Login implements WebGuiHTTPPage {
 	
 	private static final String TEMPLATE_NAME = "Login.html";
 	
@@ -19,8 +19,8 @@ public class Login implements VeeManageHTTPPage {
 	}
 
 	private String pRedirect = "/";
-	private String pStatus = VeeManageHTTPD.HTTP_OK;
-	private int pFlags = VeeManageHTTPD.FLAG_NONE;
+	private String pStatus = WebGuiHTTPD.HTTP_OK;
+	private int pFlags = WebGuiHTTPD.FLAG_NONE;
 	
 	private Session mUserSession = null;
 	
@@ -35,16 +35,16 @@ public class Login implements VeeManageHTTPPage {
 	public void init(String uri, String method, Properties headers, Properties params, Properties files, Session userSession) {
 		// Reset all page vars.
 		pRedirect = "/";
-		pStatus = VeeManageHTTPD.HTTP_OK;
-		pFlags = VeeManageHTTPD.FLAG_NONE;
+		pStatus = WebGuiHTTPD.HTTP_OK;
+		pFlags = WebGuiHTTPD.FLAG_NONE;
 		mErrorText = null;
 		
 		mUserSession = userSession;
 		
 		if (mUserSession.getBoolean("UserAuthenticated", false)) {
 			pRedirect = "/";
-			pStatus = VeeManageHTTPD.HTTP_REDIRECT;
-			pFlags |= VeeManageHTTPD.FLAG_REDIRECT;
+			pStatus = WebGuiHTTPD.HTTP_REDIRECT;
+			pFlags |= WebGuiHTTPD.FLAG_REDIRECT;
 			return;
 		}
 		
@@ -58,8 +58,8 @@ public class Login implements VeeManageHTTPPage {
 				
 				mUserSession.putBoolean("UserAuthenticated", true);
 				pRedirect = "/";
-				pStatus = VeeManageHTTPD.HTTP_REDIRECT;
-				pFlags |= VeeManageHTTPD.FLAG_REDIRECT;
+				pStatus = WebGuiHTTPD.HTTP_REDIRECT;
+				pFlags |= WebGuiHTTPD.FLAG_REDIRECT;
 				return;
 				
 			} else {
@@ -76,7 +76,7 @@ public class Login implements VeeManageHTTPPage {
 
 	@Override
 	public String getMimeType() {
-		return VeeManageHTTPD.MIME_HTML;
+		return WebGuiHTTPD.MIME_HTML;
 	}
 
 	@Override

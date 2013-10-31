@@ -1,4 +1,4 @@
-package org.uigl.veemanage.httpd;
+package org.uigl.webgui;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -8,13 +8,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
-import java.util.logging.Level;
 
-import org.uigl.veemanage.VeeManage;
+import org.uigl.logger.UIGLLog;
 
 import fi.iki.elonen.NanoHTTPD.NanoHTTPD;
 
-public class VeeManageHTTPD extends NanoHTTPD {
+public class WebGuiHTTPD extends NanoHTTPD {
 
 	public static final int FLAG_NONE = 0;
 	public static final int FLAG_REDIRECT = 1;
@@ -28,11 +27,11 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	 * These classes are reused even for different users.
 	 * 
 	 */
-	private static final VeeManageHTTPPage[] mPages = new VeeManageHTTPPage[] {
-		new org.uigl.veemanage.httpd.pages.Index(),
-		new org.uigl.veemanage.httpd.pages.Logout(),
-		new org.uigl.veemanage.httpd.pages.Login(),
-		new org.uigl.veemanage.httpd.pages.SettingsPage()
+	private static final WebGuiHTTPPage[] mPages = new WebGuiHTTPPage[] {
+		new org.uigl.veemanage.webgui.pages.Index(),
+		new org.uigl.veemanage.webgui.pages.Logout(),
+		new org.uigl.veemanage.webgui.pages.Login(),
+		new org.uigl.veemanage.webgui.pages.SettingsPage()
 	};
 	
 	private File mRoot;
@@ -45,7 +44,7 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	 * @param wwwroot
 	 * @throws IOException
 	 */
-	public VeeManageHTTPD(int port, File wwwroot) throws IOException {
+	public WebGuiHTTPD(int port, File wwwroot) throws IOException {
 		super(port, wwwroot);
 		this.mRoot = wwwroot;
 		this.mSessions = new SessionManager();
@@ -55,19 +54,19 @@ public class VeeManageHTTPD extends NanoHTTPD {
 	@Override
 	public Response serve(String uri, String method, Properties header, Properties params, Properties files) {
 
-		VeeManage.LOGGER.logp(Level.INFO, VeeManageHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "URI:" + uri);
+		UIGLLog.i( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "URI:" + uri);
 
 		Response page = new Response();
 		page.status = HTTP_OK;
 		page.mimeType = MIME_HTML;
 		cookiesToParams(header, params);
 		
-		for (VeeManageHTTPPage pageClass : mPages) {
+		for (WebGuiHTTPPage pageClass : mPages) {
 			
 			try {
 				if (pageClass.hasMatch(uri, method)) {
 
-					VeeManage.LOGGER.logp(Level.INFO, VeeManageHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Page:" + pageClass.getPageClassName());
+					UIGLLog.i( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Page:" + pageClass.getPageClassName());
 
 					Session userSession = startSession(page, params);
 					

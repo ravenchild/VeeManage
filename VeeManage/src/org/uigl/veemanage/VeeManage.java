@@ -1,17 +1,15 @@
 package org.uigl.veemanage;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.uigl.veemanage.httpd.VeeManageHTTPD;
+import org.uigl.webgui.WebGuiHTTPD;
+import org.uigl.logger.UIGLLog;
 import org.uigl.veemanage.settings.SettingsManager;
 
 import com.almworks.sqlite4java.SQLiteException;
 
 public class VeeManage {
 
-	public static final Logger LOGGER = Logger.getLogger(VeeManage.class.getName());
 	private static SettingsManager VeeManageSettings;
 	
 	public static void main(String[] args) {
@@ -35,12 +33,12 @@ public class VeeManage {
 		}
 		
 		try {
-			VeeManageHTTPD httpd = new VeeManageHTTPD( SettingsManager.DEFAULT_WWW_PORT, new File(SettingsManager.DEFAULT_WWW_ROOT).getAbsoluteFile());
+			WebGuiHTTPD httpd = new WebGuiHTTPD( SettingsManager.DEFAULT_WWW_PORT, new File(SettingsManager.DEFAULT_WWW_ROOT).getAbsoluteFile());
 			
 			if (httpd.isSecure())
-				LOGGER.log(Level.INFO, "Using HTTPS on port " + SettingsManager.DEFAULT_WWW_PORT + ".");
+				UIGLLog.c(VeeManage.class.getName(), "main", "Using HTTPS on port " + SettingsManager.DEFAULT_WWW_PORT + ".");
 			else
-				LOGGER.log(Level.INFO, "Using HTTP on port " + SettingsManager.DEFAULT_WWW_PORT + ".");
+				UIGLLog.c(VeeManage.class.getName(), "main", "Using HTTP on port " + SettingsManager.DEFAULT_WWW_PORT + ".");
 			
 		} catch(Exception e) {
 			System.err.println( "Couldn't start server:\n" + e );

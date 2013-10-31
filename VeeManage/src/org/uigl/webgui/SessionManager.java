@@ -1,9 +1,8 @@
-package org.uigl.veemanage.httpd;
+package org.uigl.webgui;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 
-import org.uigl.veemanage.VeeManage;
+import org.uigl.logger.UIGLLog;
 
 public class SessionManager {
 
@@ -149,7 +148,7 @@ public class SessionManager {
 			int purged = mSessionPurge.doPurge();
 			mCanPurge = true;
 			
-			VeeManage.LOGGER.logp(Level.INFO, purgeSessionsThread.class.getName(), "run()", "Purged " + String.valueOf(purged) + " sessions.");
+			UIGLLog.i( purgeSessionsThread.class.getName(), "run()", "Purged " + String.valueOf(purged) + " sessions.");
 		}
 	}
 

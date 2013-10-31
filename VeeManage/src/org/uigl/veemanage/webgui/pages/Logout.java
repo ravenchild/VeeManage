@@ -1,13 +1,13 @@
-package org.uigl.veemanage.httpd.pages;
+package org.uigl.veemanage.webgui.pages;
 
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.uigl.veemanage.httpd.Session;
-import org.uigl.veemanage.httpd.VeeManageHTTPD;
-import org.uigl.veemanage.httpd.VeeManageHTTPPage;
+import org.uigl.webgui.Session;
+import org.uigl.webgui.WebGuiHTTPD;
+import org.uigl.webgui.WebGuiHTTPPage;
 
-public class Logout implements VeeManageHTTPPage {
+public class Logout implements WebGuiHTTPPage {
 	
 	@Override
 	public String getPageClassName() {
@@ -26,12 +26,12 @@ public class Logout implements VeeManageHTTPPage {
 
 	@Override
 	public String getStatus() {
-		return VeeManageHTTPD.HTTP_OK;
+		return WebGuiHTTPD.HTTP_OK;
 	}
 
 	@Override
 	public String getMimeType() {
-		return VeeManageHTTPD.MIME_HTML;
+		return WebGuiHTTPD.MIME_HTML;
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class Logout implements VeeManageHTTPPage {
 
 	@Override
 	public int getFlags() {
-		return VeeManageHTTPD.FLAG_REDIRECT | VeeManageHTTPD.FLAG_NO_CACHE | VeeManageHTTPD.FLAG_REMOVE_SESSION;
+		return WebGuiHTTPD.FLAG_REDIRECT | WebGuiHTTPD.FLAG_NO_CACHE | WebGuiHTTPD.FLAG_REMOVE_SESSION;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package org.uigl.veemanage.db;
+package org.uigl.liballdata;
 
 public class Statement {
 	

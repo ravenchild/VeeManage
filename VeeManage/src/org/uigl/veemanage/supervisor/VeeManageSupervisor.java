@@ -1,14 +1,14 @@
 package org.uigl.veemanage.supervisor;
 
 import org.uigl.veemanage.settings.SettingsManager;
-import org.uigl.veemanage.httpd.VeeManageHTTPD;
 import org.uigl.veemanage.vm.VirtManager;
+import org.uigl.webgui.WebGuiHTTPD;
 
 public class VeeManageSupervisor {
 	
 	private SettingsManager mSettingsManager;
 	
-	private VeeManageHTTPD mHTTPD;
+	private WebGuiHTTPD mHTTPD;
 	private VirtManager mVirtManager;
 	
 	public VeeManageSupervisor() {

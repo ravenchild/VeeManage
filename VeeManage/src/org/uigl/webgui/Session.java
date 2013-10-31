@@ -1,10 +1,9 @@
-package org.uigl.veemanage.httpd;
+package org.uigl.webgui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
-import org.uigl.veemanage.VeeManage;
+import org.uigl.logger.UIGLLog;
 
 public class Session {
 	
@@ -23,7 +22,7 @@ public class Session {
 		this.mID = sessionID;
 		this.mVariables = new HashMap<String, Object>();
 		if (sessionID != null)
-			VeeManage.LOGGER.logp(Level.INFO, Session.class.getName(), "Session(UUID id)", "New Session (" + (sessionID == null ? "null" : sessionID) + ")");
+			UIGLLog.i( Session.class.getName(), "Session(UUID id)", "New Session (" + (sessionID == null ? "null" : sessionID) + ")");
 	}
 	
 	/**
@@ -354,7 +353,7 @@ public class Session {
 			return ret;
 		} catch (ClassCastException e) {
 			// Hopefully this never happens, otherwise java is broken :(
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "get", "Invalid cast to 'Object'.", e);
+			UIGLLog.w( Session.class.getName(), "get", "Invalid cast to 'Object'.", e);
 			return defaultValue;
 		}
 	}
@@ -388,7 +387,7 @@ public class Session {
 		try {
 			return (Object[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getObjectArray", "Invalid cast to 'Object[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getObjectArray", "Invalid cast to 'Object[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -408,7 +407,7 @@ public class Session {
 		try {
 			return (Boolean) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getBoolean", "Invalid cast to 'boolean'.", e);
+			UIGLLog.w( Session.class.getName(), "getBoolean", "Invalid cast to 'boolean'.", e);
 			return defaultValue;
 		}
 	}
@@ -442,7 +441,7 @@ public class Session {
 		try {
 			return (boolean[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getBooleanArray", "Invalid cast to 'boolean[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getBooleanArray", "Invalid cast to 'boolean[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -473,7 +472,7 @@ public class Session {
 		try {
 			return (Byte) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getByte", "Invalid cast to 'byte'.", e);
+			UIGLLog.w( Session.class.getName(), "getByte", "Invalid cast to 'byte'.", e);
 			return defaultValue;
 		}
 	}
@@ -507,7 +506,7 @@ public class Session {
 		try {
 			return (byte[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getByteArray", "Invalid cast to 'byte[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getByteArray", "Invalid cast to 'byte[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -538,7 +537,7 @@ public class Session {
 		try {
 			return (Character) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getChar", "Invalid cast to 'char'.", e);
+			UIGLLog.w( Session.class.getName(), "getChar", "Invalid cast to 'char'.", e);
 			return defaultValue;
 		}
 	}
@@ -572,7 +571,7 @@ public class Session {
 		try {
 			return (char[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getCharArray", "Invalid cast to 'char[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getCharArray", "Invalid cast to 'char[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -606,7 +605,7 @@ public class Session {
 		try {
 			return (CharSequence) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getCharSequence", "Invalid cast to 'CharSequence'.", e);
+			UIGLLog.w( Session.class.getName(), "getCharSequence", "Invalid cast to 'CharSequence'.", e);
 			return defaultValue;
 		}
 	}
@@ -640,7 +639,7 @@ public class Session {
 		try {
 			return (CharSequence[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getCharSequenceArray", "Invalid cast to 'CharSequence[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getCharSequenceArray", "Invalid cast to 'CharSequence[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -676,7 +675,7 @@ public class Session {
 		try {
 			return (ArrayList<CharSequence>) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getCharSequenceArrayList", "Invalid cast to 'ArrayList<CharSequence>'.", e);
+			UIGLLog.w( Session.class.getName(), "getCharSequenceArrayList", "Invalid cast to 'ArrayList<CharSequence>'.", e);
 			return defaultValue;
 		}
 	}
@@ -707,7 +706,7 @@ public class Session {
 		try {
 			return (Double) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getDouble", "Invalid cast to 'double'.", e);
+			UIGLLog.w( Session.class.getName(), "getDouble", "Invalid cast to 'double'.", e);
 			return defaultValue;
 		}
 	}
@@ -741,7 +740,7 @@ public class Session {
 		try {
 			return (double[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getDoubleArray", "Invalid cast to 'double[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getDoubleArray", "Invalid cast to 'double[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -772,7 +771,7 @@ public class Session {
 		try {
 			return (Float) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getFloat", "Invalid cast to 'float'.", e);
+			UIGLLog.w( Session.class.getName(), "getFloat", "Invalid cast to 'float'.", e);
 			return defaultValue;
 		}
 	}
@@ -806,7 +805,7 @@ public class Session {
 		try {
 			return (float[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getFloatArray", "Invalid cast to 'float[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getFloatArray", "Invalid cast to 'float[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -837,7 +836,7 @@ public class Session {
 		try {
 			return (Integer) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getInteger", "Invalid cast to 'int'.", e);
+			UIGLLog.w( Session.class.getName(), "getInteger", "Invalid cast to 'int'.", e);
 			return defaultValue;
 		}
 	}
@@ -871,7 +870,7 @@ public class Session {
 		try {
 			return (int[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getIntegerArray", "Invalid cast to 'int[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getIntegerArray", "Invalid cast to 'int[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -907,7 +906,7 @@ public class Session {
 		try {
 			return (ArrayList<Integer>) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getIntegerArrayList", "Invalid cast to 'ArrayList<Integer>'.", e);
+			UIGLLog.w( Session.class.getName(), "getIntegerArrayList", "Invalid cast to 'ArrayList<Integer>'.", e);
 			return defaultValue;
 		}
 	}
@@ -938,7 +937,7 @@ public class Session {
 		try {
 			return (Long) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getLong", "Invalid cast to 'long'.", e);
+			UIGLLog.w( Session.class.getName(), "getLong", "Invalid cast to 'long'.", e);
 			return defaultValue;
 		}
 	}
@@ -972,7 +971,7 @@ public class Session {
 		try {
 			return (long[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getLongArray", "Invalid cast to 'long[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getLongArray", "Invalid cast to 'long[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -1003,7 +1002,7 @@ public class Session {
 		try {
 			return (Short) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getShort", "Invalid cast to 'short'.", e);
+			UIGLLog.w( Session.class.getName(), "getShort", "Invalid cast to 'short'.", e);
 			return defaultValue;
 		}
 	}
@@ -1037,7 +1036,7 @@ public class Session {
 		try {
 			return (short[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getShortArray", "Invalid cast to 'short[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getShortArray", "Invalid cast to 'short[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -1071,7 +1070,7 @@ public class Session {
 		try {
 			return (String) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getString", "Invalid cast to 'String'.", e);
+			UIGLLog.w( Session.class.getName(), "getString", "Invalid cast to 'String'.", e);
 			return defaultValue;
 		}
 	}
@@ -1105,7 +1104,7 @@ public class Session {
 		try {
 			return (String[]) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getStringArray", "Invalid cast to 'String[]'.", e);
+			UIGLLog.w( Session.class.getName(), "getStringArray", "Invalid cast to 'String[]'.", e);
 			return defaultValue;
 		}
 	}
@@ -1141,7 +1140,7 @@ public class Session {
 		try {
 			return (ArrayList<String>) ret;
 		} catch (ClassCastException e) {
-			VeeManage.LOGGER.logp(Level.WARNING, Session.class.getName(), "getStringArrayList", "Invalid cast to 'ArrayList<String>'.", e);
+			UIGLLog.w( Session.class.getName(), "getStringArrayList", "Invalid cast to 'ArrayList<String>'.", e);
 			return defaultValue;
 		}
 	}

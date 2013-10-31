@@ -1,9 +1,9 @@
-package org.uigl.veemanage.db.drivers;
+package org.uigl.liballdata.drivers;
 
-import org.uigl.veemanage.db.BindParam;
-import org.uigl.veemanage.db.Cursor;
-import org.uigl.veemanage.db.DatabaseDriver;
-import org.uigl.veemanage.db.Statement;
+import org.uigl.liballdata.BindParam;
+import org.uigl.liballdata.Cursor;
+import org.uigl.liballdata.DatabaseDriver;
+import org.uigl.liballdata.Statement;
 
 public class SQLiteDriver extends DatabaseDriver {
 

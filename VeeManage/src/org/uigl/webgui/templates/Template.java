@@ -1,16 +1,14 @@
-package org.uigl.veemanage.httpd.templates;
+package org.uigl.webgui.templates;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.logging.Level;
 
-import org.uigl.veemanage.VeeManage;
-import org.uigl.veemanage.httpd.Session;
+import org.uigl.logger.UIGLLog;
+import org.uigl.webgui.Session;
 
 public class Template {
 	
@@ -38,8 +36,7 @@ public class Template {
 				resourceStream.close();
 				TemplateCache.put(resourceName, templateBytes);
 			} catch (IOException e) {
-				e.printStackTrace();
-				VeeManage.LOGGER.logp(Level.SEVERE, TemplateStream.class.getName(), "getTemplateByteStream(String resourceName)", "IOException");
+				UIGLLog.s( TemplateStream.class.getName(), "getTemplateByteStream(String resourceName)", "IOException", e);
 			}
 		}
 		return new ByteArrayInputStream(templateBytes);
@@ -54,7 +51,7 @@ public class Template {
 			super(in);
 			mArgs = args;
 			if (mArgs == null)
-				VeeManage.LOGGER.logp(Level.SEVERE, TemplateStream.class.getName(), "TemplateStream(InputStream in, Session args)", "Null Args");
+				UIGLLog.s( TemplateStream.class.getName(), "TemplateStream(InputStream in, Session args)", "Null Args");
 		}
 
 		@Override
@@ -76,7 +73,7 @@ public class Template {
 		            
 		            Object varVal = mArgs.get(varName.toString());
 		            if (varVal == null || varVal.toString() == null) {
-		            	VeeManage.LOGGER.logp(Level.WARNING, TemplateStream.class.getName(), "read()", "Cannot find variable \"" + varName + "\"");
+		            	UIGLLog.w( TemplateStream.class.getName(), "read()", "Cannot find variable \"" + varName + "\"");
 		            	varVal = varName;
 		            }
 		            for (char vc : varVal.toString().toCharArray())
@@ -101,7 +98,7 @@ public class Template {
 			            }
 			            includeStream.close();
 		            } catch (Exception e) {
-		            	VeeManage.LOGGER.logp(Level.WARNING, TemplateStream.class.getName(), "read()", "Cannot find resource \"" + incName + "\"");
+		            	UIGLLog.w( TemplateStream.class.getName(), "read()", "Cannot find resource \"" + incName + "\"");
 		            }
 		            
 		            if (mBuffer.isEmpty())
