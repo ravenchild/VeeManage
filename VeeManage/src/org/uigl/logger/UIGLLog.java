@@ -38,8 +38,10 @@ public final class UIGLLog {
 				fileOut.write('\n');
 				fileOut.write(record.getMessage());
 				if (record.getThrown() != null) {
-					fileOut.write('\n');
-					fileOut.write(record.getThrown().getMessage());
+					if (record.getThrown().getMessage() != null) {
+						fileOut.write('\n');
+						fileOut.write(record.getThrown().getMessage());
+					}
 					fileOut.write('\n');
 					record.getThrown().printStackTrace(fileOut);
 				}
