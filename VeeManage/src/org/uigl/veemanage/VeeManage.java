@@ -2,9 +2,9 @@ package org.uigl.veemanage;
 
 import java.io.File;
 
-import org.uigl.webgui.WebGuiHTTPD;
 import org.uigl.logger.UIGLLog;
 import org.uigl.veemanage.settings.SettingsManager;
+import org.uigl.veemanage.webgui.VeeManageHTTPD;
 
 import com.almworks.sqlite4java.SQLiteException;
 
@@ -33,7 +33,7 @@ public class VeeManage {
 		}
 		
 		try {
-			WebGuiHTTPD httpd = new WebGuiHTTPD( SettingsManager.DEFAULT_WWW_PORT, new File(SettingsManager.DEFAULT_WWW_ROOT).getAbsoluteFile());
+			VeeManageHTTPD httpd = new VeeManageHTTPD( SettingsManager.DEFAULT_WWW_PORT, new File(SettingsManager.DEFAULT_WWW_ROOT).getAbsoluteFile());
 			
 			if (httpd.isSecure())
 				UIGLLog.c(VeeManage.class.getName(), "main", "Using HTTPS on port " + SettingsManager.DEFAULT_WWW_PORT + ".");

@@ -11,7 +11,7 @@ import org.uigl.webgui.templates.Template;
 
 public class Login implements WebGuiHTTPPage {
 	
-	private static final String TEMPLATE_NAME = "Login.html";
+	private static final String TEMPLATE_NAME = "/org/uigl/veemanage/webgui/templates/Login.html";
 	
 	@Override
 	public String getPageClassName() {

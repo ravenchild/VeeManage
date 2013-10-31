@@ -11,7 +11,7 @@ import org.uigl.webgui.templates.Template;
 
 public class Index implements WebGuiHTTPPage {
 
-	private static final String TEMPLATE_NAME = "Index.html";
+	private static final String TEMPLATE_NAME = "/org/uigl/veemanage/webgui/templates/Index.html";
 	
 	@Override
 	public String getPageClassName() {

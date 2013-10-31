@@ -11,7 +11,7 @@ import org.uigl.webgui.templates.Template;
 
 public class SettingsPage implements WebGuiHTTPPage {
 
-	private static final String TEMPLATE_NAME = "Settings.html";
+	private static final String TEMPLATE_NAME = "/org/uigl/veemanage/webgui/templates/Settings.html";
 	
 	@Override
 	public String getPageClassName() {
@@ -27,7 +27,7 @@ public class SettingsPage implements WebGuiHTTPPage {
 	
 	@Override
 	public boolean hasMatch(String uri, String method) {
-		return uri.equals("/");
+		return uri.equals("/settings/");
 	}
 
 	@Override

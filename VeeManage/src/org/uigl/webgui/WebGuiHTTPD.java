@@ -21,21 +21,20 @@ public class WebGuiHTTPD extends NanoHTTPD {
 	public static final int FLAG_FILE = 4;
 	public static final int FLAG_NO_CACHE = 8;
 	
+	private File mRoot;
+	private SessionManager mSessions;
+	
+
+	
 	/**
 	 * List the pages for the HTTPD here.
 	 * The pages should be stateless classes.
 	 * These classes are reused even for different users.
 	 * 
 	 */
-	private static final WebGuiHTTPPage[] mPages = new WebGuiHTTPPage[] {
-		new org.uigl.veemanage.webgui.pages.Index(),
-		new org.uigl.veemanage.webgui.pages.Logout(),
-		new org.uigl.veemanage.webgui.pages.Login(),
-		new org.uigl.veemanage.webgui.pages.SettingsPage()
-	};
-	
-	private File mRoot;
-	private SessionManager mSessions;
+	protected WebGuiHTTPPage[] getPages() {
+		return new WebGuiHTTPPage[] {};
+	}
 	
 	/**
 	 * Start a new HTTPD.
@@ -61,8 +60,9 @@ public class WebGuiHTTPD extends NanoHTTPD {
 		page.mimeType = MIME_HTML;
 		cookiesToParams(header, params);
 		
-		for (WebGuiHTTPPage pageClass : mPages) {
-			
+		for (WebGuiHTTPPage pageClass : getPages()) {
+			UIGLLog.i( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Testing Page: " + pageClass.getPageClassName());
+
 			try {
 				if (pageClass.hasMatch(uri, method)) {
 
@@ -97,16 +97,24 @@ public class WebGuiHTTPD extends NanoHTTPD {
 					if ((pageClass.getFlags() & FLAG_FILE) == FLAG_FILE)
 						break;
 					
+					UIGLLog.i( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Returned Status: " + page.status);
+					
 					return page;
 				}
 			} catch (Exception e) {
+				UIGLLog.s( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "500 Error", e);
+			
 				page.status = HTTP_INTERNALERROR;
 				page.mimeType = MIME_HTML;
 				page.data = new ByteArrayInputStream(("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"><html><head><title>" + HTTP_INTERNALERROR + "</title></head><body><h1>" + HTTP_INTERNALERROR + "</h1><br><h2>Error contents:</h2><br><pre>" + e.getMessage() + "</pre><br><h2>Stack Trace:</h2><br><pre>" + getStackTrace(e) + "</pre></body></html>").getBytes());
+				
+				return page;
 			}
 			
 		}
-			
+		
+		UIGLLog.w( WebGuiHTTPD.class.getName(), "serve(String uri, String method, Properties header, Properties params, Properties files)", "Forwarding Response.");
+
 		return super.serveFile(uri, header, this.mRoot, false);
 	}
 	

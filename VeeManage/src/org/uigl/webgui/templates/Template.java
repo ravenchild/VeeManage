@@ -22,6 +22,7 @@ public class Template {
 	 * @return The templated InputStream
 	 */
 	public static InputStream applyTemplate(String resourceName, Session args) {
+		UIGLLog.i( TemplateStream.class.getName(), "applyTemplate(String resourceName, Session args)", resourceName);
 		InputStream template = getTemplateByteStream(resourceName);
 		return new Template.TemplateStream(template, args);
 	}
