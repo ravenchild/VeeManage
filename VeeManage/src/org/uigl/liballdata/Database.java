@@ -1,10 +1,6 @@
 package org.uigl.liballdata;
 
 public interface Database {
-	
-	public enum DataTypes {
-		INTEGER, REAL, TEXT, BLOB, NULL;
-	}
 
 	/**
 	 * Used in changing the conflict resolution strategy of the database.
@@ -36,7 +32,7 @@ public interface Database {
 	public void close(boolean saveConnection);
 	public Cursor rawQuery(String sql) throws DatabaseException;
 	public Cursor rawQuery(String sql, BindParam... params) throws DatabaseException;
-	public Cursor query(Statement query);
-	public long insert(Statement insert);
+	public Cursor query(Statement query) throws DatabaseException;
+	public long insert(Statement insert) throws DatabaseException;
 	
 }

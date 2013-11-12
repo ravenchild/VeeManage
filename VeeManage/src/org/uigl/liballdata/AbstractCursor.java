@@ -1,6 +1,6 @@
 package org.uigl.liballdata;
 
-import org.uigl.liballdata.Database.DataTypes;
+import org.uigl.liballdata.DataTypes;
 
 public abstract class AbstractCursor implements Cursor {
 	

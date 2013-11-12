@@ -3,6 +3,7 @@ package org.uigl.liballdata.drivers;
 import org.uigl.liballdata.BindParam;
 import org.uigl.liballdata.Cursor;
 import org.uigl.liballdata.DatabaseDriver;
+import org.uigl.liballdata.DatabaseException;
 import org.uigl.liballdata.Statement;
 
 public class SQLiteDriver extends DatabaseDriver {
@@ -14,20 +15,20 @@ public class SQLiteDriver extends DatabaseDriver {
 	
 	@Override
 	public long open(boolean keepAlive) {
-		// TODO Auto-generated method stub
+		//You can't open it so return 0;
 		return 0;
 	}
 
 	@Override
 	public long close(boolean saveConnection) {
-		// TODO Auto-generated method stub
+		//You can't close it so return 0;
 		return 0;
 	}
 
 	@Override
 	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
+		//Technically always open.
+		return true;
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class SQLiteDriver extends DatabaseDriver {
 	}
 
 	@Override
-	public Cursor query(Statement statement) {
+	public Cursor query(Statement statement) throws DatabaseException {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("SELECT");
@@ -75,8 +76,7 @@ public class SQLiteDriver extends DatabaseDriver {
 		if (statement.getLimit() != null)
 			query.append(statement.getLimit());
 		
-		//TODO: return something else.
-		return null;
+		return rawQuery(query.toString(), statement.getSelectionArgs());
 	}
 
 	@Override
@@ -86,12 +86,16 @@ public class SQLiteDriver extends DatabaseDriver {
 	}
 
 	@Override
-	public Cursor rawQuery(String sql) {
+	public Cursor rawQuery(String sql) throws DatabaseException {
 		return rawQuery(sql, (BindParam[]) null);
 	}
 	
 	@Override
-	public Cursor rawQuery(String sql, BindParam ... params) {
+	public Cursor rawQuery(String sql, BindParam ... params) throws DatabaseException {
+
+		sql = bindParams(sql, params);
+		
+		//TODO:Do query.
 		return null;
 	}
 
@@ -113,5 +117,4 @@ public class SQLiteDriver extends DatabaseDriver {
 		return 0;
 	}
 
-	
 }

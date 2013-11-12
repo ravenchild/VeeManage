@@ -67,31 +67,16 @@ public abstract class AbstractDatabase<DriverClass extends DatabaseDriver> imple
 		return mConnection.rawQuery(sql);
 	}
 
-	public Cursor rawQuery(String sql, BindParam... params)
-			throws DatabaseException {
+	public Cursor rawQuery(String sql, BindParam... params) throws DatabaseException {
 		return mConnection.rawQuery(sql, params);
 	}
 
-	public Cursor query(Statement query) {
+	public Cursor query(Statement query) throws DatabaseException {
 		return mConnection.query(query);
 	}
 
-	public long insert(Statement insert) {
+	public long insert(Statement insert) throws DatabaseException {
 		return mConnection.insert(insert);
 	}
 
-	/*
-	 * private Cursor bindParams(Cursor statement, List<BindParam> params)
-	 * throws DatabaseException {
-	 * 
-	 * int paramCount = statement.getBindParameterCount();
-	 * 
-	 * if (paramCount != params.size()) throw new
-	 * DatabaseException("Available params not equal to params supplied.");
-	 * 
-	 * for (int i=1; i <= paramCount; i++) { BindParam param = params.get(i -
-	 * 1); if (param != null) param.bindTo(i, statement); }
-	 * 
-	 * return statement; }
-	 */
 }

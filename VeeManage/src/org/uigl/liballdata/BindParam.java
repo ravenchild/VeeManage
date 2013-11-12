@@ -1,10 +1,5 @@
 package org.uigl.liballdata;
 
-import java.sql.SQLDataException;
-
-import com.almworks.sqlite4java.SQLiteException;
-import com.almworks.sqlite4java.SQLiteStatement;
-
 public class BindParam {
 
 	private Long mInteger;
@@ -64,20 +59,35 @@ public class BindParam {
 		mNull = false;
 	}
 	
-	public void bindTo(int index, SQLiteStatement statement) throws DatabaseException, SQLiteException, SQLDataException {
-		if (mInteger != null)
-			statement.bind(index, mInteger);
-		else if (mNull)
-			statement.bindNull(index);
-		else if (mText != null)
-			statement.bind(index, mText);
-		else if (mReal != null)
-			statement.bind(index, mReal);
-		else if (mBlob != null)
-			statement.bind(index, mBlob);
-		else
-			throw new SQLDataException("No data to bind.");
+	public String getText() {
+		return mText;
 	}
 	
+	public byte[] getBlob() {
+		return mBlob;
+	}
+	
+	public Double getReal() {
+		return mReal;
+	}
+	
+	public Long getInteger() {
+		return mInteger;
+	}
+	
+	public DataTypes getType() throws DatabaseException {
+		if (mInteger != null)
+			return DataTypes.INTEGER;
+		else if (mNull)
+			return DataTypes.NULL;
+		else if (mText != null)
+			return DataTypes.TEXT;
+		else if (mReal != null)
+			return DataTypes.REAL;
+		else if (mBlob != null)
+			return DataTypes.BLOB;
+		else
+			throw new DatabaseException("Invalid Type");
+	}
 	
 }

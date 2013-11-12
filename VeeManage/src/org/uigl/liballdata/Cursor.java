@@ -2,7 +2,7 @@ package org.uigl.liballdata;
 
 import java.io.Closeable;
 
-import org.uigl.liballdata.Database.DataTypes;
+import org.uigl.liballdata.DataTypes;
 
 public interface Cursor extends Closeable {
 	
