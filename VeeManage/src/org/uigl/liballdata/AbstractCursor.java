@@ -29,7 +29,7 @@ public abstract class AbstractCursor implements Cursor {
 	}
 	
 	abstract protected void onClose();
-	abstract public String[] getColumnNames();
+	abstract public String[] getColumnNames() throws DatabaseException;
 	abstract public long getCount();
 	abstract protected boolean onMove(long currentPosition, long newPosition);
 
@@ -45,7 +45,7 @@ public abstract class AbstractCursor implements Cursor {
 		return mStatement;
 	}
 
-	public int getColumnCount() {
+	public int getColumnCount() throws DatabaseException {
 		return getColumnNames().length;
 	}
 
@@ -53,19 +53,19 @@ public abstract class AbstractCursor implements Cursor {
 		return mPosition;
 	}
 
-	public boolean moveToNext() {
+	public boolean moveToNext() throws DatabaseException {
 		return moveToPosition(mPosition + 1L);
 	}
 
-	public boolean moveToPrevious() {
+	public boolean moveToPrevious() throws DatabaseException {
 		return moveToPosition(mPosition - 1L);
 	}
 
-	public boolean move(long offset) {
+	public boolean move(long offset) throws DatabaseException {
 		return moveToPosition(mPosition + offset);
 	}
 
-	public boolean moveToPosition(long position) {
+	public boolean moveToPosition(long position) throws DatabaseException {
 		final long count = getCount();
 		boolean retVal = false;
 		
@@ -89,11 +89,11 @@ public abstract class AbstractCursor implements Cursor {
         return retVal;
 	}
 
-	public boolean moveToFirst() {
+	public boolean moveToFirst() throws DatabaseException {
 		return moveToPosition(0L);
 	}
 
-	public boolean moveToLast() {
+	public boolean moveToLast() throws DatabaseException {
 		return moveToPosition(getCount() - 1L);
 	}
 
@@ -107,34 +107,38 @@ public abstract class AbstractCursor implements Cursor {
 	}
 
 	@Override
-	public int getColumnIndex(String name) {
+	public int getColumnIndex(String name) throws DatabaseException {
 		int periodIndex = name.lastIndexOf('.');
 		String columnName;
 		if (periodIndex >= 0)
 			columnName = name.substring(periodIndex + 1);
 		else
 			columnName = name;
-		
-		int i = 0, columnCount = getColumnNames().length;
-		String[] columnNames = getColumnNames();
+
+		try {
+			int i = 0, columnCount = getColumnCount();
+			String[] columnNames = getColumnNames();
 		for (; i < columnCount; i++)
 			if (columnNames[i].equals(columnName))
 				return i;
+		} catch (DatabaseException e) {
+			throw new DatabaseException("Error getting column index.", e);
+		}
 		
 		return -1;
 	}
 
 	@Override
-	public String getColumnName(int column) {
+	public String getColumnName(int column) throws DatabaseException {
 		return getColumnNames()[column];
 	}
 
-	abstract public DataTypes getType(int column);
-	abstract public Long getInt(int column);
-	abstract public Double getReal(int column);
-	abstract public String getText(int column);
-	abstract public Byte[] getBlob(int column);
-	abstract public boolean isNull(int column);
+	abstract public DataTypes getType(int column) throws DatabaseException;
+	abstract public Long getInt(int column) throws DatabaseException;
+	abstract public Double getReal(int column) throws DatabaseException;
+	abstract public String getText(int column) throws DatabaseException;
+	abstract public byte[] getBlob(int column) throws DatabaseException;
+	abstract public boolean isNull(int column) throws DatabaseException;
 
 	public void setInt(int column, Long value) {
 		throw new UnsupportedOperationException("Cursor does not support updates.");
