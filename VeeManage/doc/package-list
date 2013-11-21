@@ -1,7 +1,13 @@
 fi.iki.elonen.NanoHTTPD
+org.uigl.liballdata
+org.uigl.liballdata.drivers
+org.uigl.logger
 org.uigl.veemanage
-org.uigl.veemanage.httpd
-org.uigl.veemanage.httpd.pages
-org.uigl.veemanage.httpd.templates
+org.uigl.veemanage.settings
+org.uigl.veemanage.settings.db
 org.uigl.veemanage.supervisor
 org.uigl.veemanage.vm
+org.uigl.veemanage.webgui
+org.uigl.veemanage.webgui.pages
+org.uigl.webgui
+org.uigl.webgui.templates
