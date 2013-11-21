@@ -13,7 +13,7 @@ public abstract class DatabaseDriver {
 		return newDriver;
 	}
 
-	public abstract void setConnection(Object ... connectionParams);
+	public abstract void setConnection(Object ... connectionParams) throws DatabaseException;
 	
 	public abstract long open(boolean keepAlive) throws DatabaseException;
 	public abstract long close(boolean saveConnection);

@@ -31,7 +31,7 @@ public abstract class AbstractCursor implements Cursor {
 	abstract protected void onClose();
 	abstract public String[] getColumnNames() throws DatabaseException;
 	abstract public long getCount();
-	abstract protected boolean onMove(long currentPosition, long newPosition);
+	abstract protected boolean onMove(long currentPosition, long newPosition) throws DatabaseException;
 
 	public boolean canUpdate() {
 		return false;

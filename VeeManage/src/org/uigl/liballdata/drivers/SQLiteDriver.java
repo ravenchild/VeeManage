@@ -1,5 +1,7 @@
 package org.uigl.liballdata.drivers;
 
+import java.io.File;
+
 import org.uigl.liballdata.AbstractCursor;
 import org.uigl.liballdata.BindParam;
 import org.uigl.liballdata.Cursor;
@@ -9,10 +11,13 @@ import org.uigl.liballdata.DatabaseException;
 import org.uigl.liballdata.Statement;
 
 import com.almworks.sqlite4java.SQLiteConnection;
+import com.almworks.sqlite4java.SQLiteConstants;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
 
 public class SQLiteDriver extends DatabaseDriver {
+	
+	private File mFile;
 	
 	private class SQLiteCursor extends AbstractCursor {
 
@@ -22,7 +27,12 @@ public class SQLiteDriver extends DatabaseDriver {
 		@Override
 		public Cursor requery() {
 			//TODO: Need to figure out how to re-query efficiently.
-			return null;
+			try {
+				mStatement = mStatement.reset(false);
+			} catch (SQLiteException e) {
+				e.printStackTrace();
+			}
+			return this;
 		}
 
 		@Override
@@ -67,38 +77,80 @@ public class SQLiteDriver extends DatabaseDriver {
 		
 		@Override
 		public long getCount() {
-			// TODO Auto-generated method stub
+			//TODO: Figure out the best way to get row count.
 			return 0;
 		}
 
 		@Override
-		protected boolean onMove(long currentPosition, long newPosition) {
-			// TODO Auto-generated method stub
-			return false;
+		protected boolean onMove(long currentPosition, long newPosition) throws DatabaseException {
+			try {
+				if (currentPosition == newPosition - 1)
+						return mStatement.step();
+				if (currentPosition > newPosition) {
+					currentPosition = -1;
+					mStatement.reset(false);
+				}
+				while (true) {
+					if (mStatement.step())
+						currentPosition++;
+					else
+						throw new DatabaseException("Reached the end of the cursor.");
+					
+					if (currentPosition == newPosition)
+						return true;
+				}
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to move to position " + newPosition + ".", e);
+			}
 		}
 
 		@Override
-		public DataTypes getType(int column) {
-			// TODO Auto-generated method stub
-			return null;
+		public DataTypes getType(int column) throws DatabaseException {
+			try {
+				switch (mStatement.columnType(column)) {
+				case SQLiteConstants.SQLITE_BLOB:
+					return DataTypes.BLOB;
+				case SQLiteConstants.SQLITE_FLOAT:
+					return DataTypes.REAL;
+				case SQLiteConstants.SQLITE_INTEGER:
+					return DataTypes.INTEGER;
+				case SQLiteConstants.SQLITE_NULL:
+					return DataTypes.NULL;
+				case SQLiteConstants.SQLITE_TEXT:
+					return DataTypes.TEXT;
+				default:
+					return null;
+				}
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to get Type.", e);
+			}
 		}
 
 		@Override
-		public Long getInt(int column) {
-			// TODO Auto-generated method stub
-			return null;
+		public Long getInt(int column) throws DatabaseException {
+			try {
+				return mStatement.columnLong(column);
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to get Integer.", e);
+			}
 		}
 
 		@Override
-		public Double getReal(int column) {
-			// TODO Auto-generated method stub
-			return null;
+		public Double getReal(int column) throws DatabaseException {
+			try {
+				return mStatement.columnDouble(column);
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to get Real.", e);
+			}
 		}
 
 		@Override
-		public String getText(int column) {
-			// TODO Auto-generated method stub
-			return null;
+		public String getText(int column) throws DatabaseException {
+			try {
+				return mStatement.columnString(column);
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to get Text.", e);
+			}
 		}
 
 		@Override
@@ -106,21 +158,29 @@ public class SQLiteDriver extends DatabaseDriver {
 			try {
 				return mStatement.columnBlob(column);
 			} catch (SQLiteException e) {
-				throw new DatabaseException("Unable to get blob.", e);
+				throw new DatabaseException("Unable to get Blob.", e);
 			}
 		}
 
 		@Override
-		public boolean isNull(int column) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean isNull(int column) throws DatabaseException {
+			try {
+				return mStatement.columnNull(column);
+			} catch (SQLiteException e) {
+				throw new DatabaseException("Unable to get Null.", e);
+			}
 		}
 		
 	}
 
 	@Override
-	public void setConnection(Object... connectionParams) {
+	public void setConnection(Object... connectionParams) throws DatabaseException {
 		// TODO Auto-generated method stub
+		if (connectionParams == null 
+				|| connectionParams.length != 1
+				|| !File.class.equals(connectionParams[0].getClass()))
+			throw new DatabaseException("Invalid Connection Params.");
+		mFile = (File) connectionParams[0];
 	}
 	
 	@Override
@@ -202,11 +262,18 @@ public class SQLiteDriver extends DatabaseDriver {
 	
 	@Override
 	public Cursor rawQuery(String sql, BindParam ... params) throws DatabaseException {
-
-		sql = bindParams(sql, params);
+		SQLiteCursor cursor = null;
 		
-		//TODO:Do query.
-		return null;
+		try {
+			sql = bindParams(sql, params);
+			cursor = new SQLiteCursor();
+			cursor.mConnection = getConnection();
+				cursor.mStatement = cursor.mConnection.prepare(sql);
+		} catch (SQLiteException e) {
+			throw new DatabaseException("Unable to prepare the query.", e);
+		}
+		
+		return cursor;
 	}
 
 	@Override
@@ -225,6 +292,10 @@ public class SQLiteDriver extends DatabaseDriver {
 	public long delete(Statement statement) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	private SQLiteConnection getConnection() {
+		return new SQLiteConnection(mFile);
 	}
 
 }
